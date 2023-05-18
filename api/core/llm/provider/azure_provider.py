@@ -37,7 +37,10 @@ class AzureProvider(BaseProvider):
         Returns the API credentials for Azure OpenAI as a dictionary.
         """
         encrypted_config = self.get_provider_api_key(model_id=model_id)
-        config = json.loads(encrypted_config)
+        if isinstance(encrypted_config, str):
+            config = json.loads(encrypted_config)
+        else:
+            config = encrypted_config
         config['openai_api_type'] = 'azure'
         config['deployment_name'] = model_id
         return config
@@ -65,7 +68,9 @@ class AzureProvider(BaseProvider):
                 config = {
                     'openai_api_type': 'azure',
                     'openai_api_version': '2023-03-15-preview',
-                    'openai_api_base': 'https://foo.microsoft.com/bar',
+                    # 'openai_api_base': 'https://foo.microsoft.com/bar',
+                    # todo: 临时固定
+                    'openai_api_base': 'https://openai-cvte.openai.azure.com',
                     'openai_api_key': ''
                 }
 
@@ -89,12 +94,20 @@ class AzureProvider(BaseProvider):
         """
         Returns the encrypted token.
         """
-        return json.dumps({
-            'openai_api_type': 'azure',
-            'openai_api_version': '2023-03-15-preview',
-            'openai_api_base': config['openai_api_base'],
-            'openai_api_key': self.encrypt_token(config['openai_api_key'])
-        })
+        # 添加Azure OpenAI适配
+        if config['openai_api_type'] == 'azure':
+            return json.dumps({
+                'openai_api_type': config['openai_api_type'],
+                'openai_api_base': config['openai_api_base'],
+                'openai_api_version': config['azure_api_version'],
+                'openai_api_key': self.encrypt_token(token=config['azure_api_key'])
+            })
+        else:
+            return json.dumps({
+                'openai_api_type': config['openai_api_type'],
+                'openai_api_base': config['openai_api_base'],
+                'openai_api_key': self.encrypt_token(token=config['openai_api_key'])
+            })
 
     def get_decrypted_token(self, token: str):
         """

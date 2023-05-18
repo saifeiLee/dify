@@ -28,10 +28,11 @@ def generate_key_pair(tenant_id):
 def encrypt(text, public_key):
     if isinstance(public_key, str):
         public_key = public_key.encode()
-
+    encrypted_text = ''
     rsa_key = RSA.import_key(public_key)
     cipher = PKCS1_OAEP.new(rsa_key)
-    encrypted_text = cipher.encrypt(text.encode())
+    if text:
+        encrypted_text = cipher.encrypt(text.encode())
     return encrypted_text
 
 

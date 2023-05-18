@@ -14,8 +14,9 @@ model_templates = {
             'api_rph': 0,
             'status': 'normal'
         },
+        # ToDo: 切换 azure openai
         'model_config': {
-            'provider': 'openai',
+            'provider': 'azure_openai',
             'model_id': 'text-davinci-003',
             'configs': {
                 'prompt_template': '',

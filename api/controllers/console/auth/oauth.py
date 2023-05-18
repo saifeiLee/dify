@@ -7,7 +7,7 @@ import requests
 from flask import request, redirect, current_app, session
 from flask_restful import Resource
 
-from libs.oauth import OAuthUserInfo, GitHubOAuth, GoogleOAuth
+from libs.oauth import OAuthUserInfo, GitHubOAuth, GoogleOAuth, KeyCloakOAuth
 from extensions.ext_database import db
 from models.account import Account, AccountStatus
 from services.account_service import AccountService, RegisterService
@@ -17,20 +17,28 @@ from .. import api
 def get_oauth_providers():
     with current_app.app_context():
         github_oauth = GitHubOAuth(client_id=current_app.config.get('GITHUB_CLIENT_ID'),
-                                   client_secret=current_app.config.get(
-                                       'GITHUB_CLIENT_SECRET'),
+                                   client_secret=current_app.config.get('GITHUB_CLIENT_SECRET'),
+                                   app_uri=current_app.config.get('APP_URL'), url=None,
                                    redirect_uri=current_app.config.get(
                                        'CONSOLE_URL') + '/console/api/oauth/authorize/github')
 
         google_oauth = GoogleOAuth(client_id=current_app.config.get('GOOGLE_CLIENT_ID'),
-                                   client_secret=current_app.config.get(
-                                       'GOOGLE_CLIENT_SECRET'),
+                                   client_secret=current_app.config.get('GOOGLE_CLIENT_SECRET'),
+                                   app_uri=current_app.config.get('APP_URL'), url=None,
                                    redirect_uri=current_app.config.get(
                                        'CONSOLE_URL') + '/console/api/oauth/authorize/google')
 
+        keycloak_oauth = KeyCloakOAuth(client_id=current_app.config.get('SSO_CLIENT_ID'),
+                                       client_secret=current_app.config.get('SSO_CLIENT_SECRET'),
+                                       app_uri=current_app.config.get('API_URL'),
+                                       url=current_app.config.get('SSO_URL'),
+                                       redirect_uri=current_app.config.get('CONSOLE_URL') +
+                                                    '/console/api/oauth/authorize/keycloak')
+
         OAUTH_PROVIDERS = {
             'github': github_oauth,
-            'google': google_oauth
+            'google': google_oauth,
+            'keycloak': keycloak_oauth
         }
         return OAUTH_PROVIDERS
 
@@ -80,7 +88,7 @@ class OAuthCallback(Resource):
         flask_login.login_user(account, remember=True)
         AccountService.update_last_login(account, request)
 
-        return redirect(f'{current_app.config.get("CONSOLE_URL")}?oauth_login=success')
+        return redirect(f'{current_app.config.get("APP_URL")}?oauth_login=success')
 
 
 def _get_account_by_openid_or_email(provider: str, user_info: OAuthUserInfo) -> Optional[Account]:

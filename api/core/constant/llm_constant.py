@@ -3,7 +3,9 @@ from _decimal import Decimal
 models = {
     'gpt-4': 'openai',  # 8,192 tokens
     'gpt-4-32k': 'openai',  # 32,768 tokens
-    'gpt-3.5-turbo': 'openai',  # 4,096 tokens
+    # 'gpt-3.5-turbo': 'openai',  # 4,096 tokens
+    # ToDo: 切换 azure openai
+    'gpt-3.5-turbo': 'azure_openai',  # 4,096 tokens
     'text-davinci-003': 'openai',  # 4,097 tokens
     'text-davinci-002': 'openai',  # 4,097 tokens
     'text-curie-001': 'openai',  # 2,049 tokens

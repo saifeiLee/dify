@@ -16,8 +16,10 @@ if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PRE
   publicApiPrefix = globalThis.document.body.getAttribute('data-pubic-api-prefix') as string
 } else {
   if (isDevelopment) {
-    apiPrefix = 'https://cloud.dify.dev/console/api';
-    publicApiPrefix = 'https://dev.udify.app/api';
+    // apiPrefix = 'https://cloud.dify.dev/console/api';
+    // publicApiPrefix = 'https://dev.udify.app/api';
+    apiPrefix = 'http://dify.cvte.com:5001/console/api';
+    publicApiPrefix = 'http://dify.cvte.com:5001/api';
   } else {
     // const domainParts = globalThis.location?.host?.split('.');
     // in production env, the host is dify.app . In other env, the host is [dev].dify.app

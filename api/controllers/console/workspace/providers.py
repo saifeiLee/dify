@@ -119,8 +119,10 @@ class ProviderTokenApi(Resource):
 
         db.session.commit()
 
-        if provider in [ProviderName.ANTHROPIC.value, ProviderName.AZURE_OPENAI.value, ProviderName.COHERE.value,
-                        ProviderName.HUGGINGFACEHUB.value]:
+        # ToDo: 临时调整释放AZURE_OPENAI支持
+        # if provider in [ProviderName.ANTHROPIC.value, ProviderName.AZURE_OPENAI.value, ProviderName.COHERE.value,
+        #                 ProviderName.HUGGINGFACEHUB.value]:
+        if provider in [ProviderName.ANTHROPIC.value, ProviderName.COHERE.value, ProviderName.HUGGINGFACEHUB.value]:
             return {'result': 'success', 'warning': 'MOCK: This provider is not supported yet.'}, 201
 
         return {'result': 'success'}, 201

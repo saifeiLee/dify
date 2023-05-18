@@ -10,12 +10,13 @@ class OAuthUserInfo:
     name: str
     email: str
 
-
 class OAuth:
-    def __init__(self, client_id: str, client_secret: str, redirect_uri: str):
+    def __init__(self, client_id: str, client_secret: str, redirect_uri: str, app_uri: str, url: str):
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
+        self.app_uri = app_uri
+        self.url = url
 
     def get_authorization_url(self):
         raise NotImplementedError()
@@ -119,7 +120,6 @@ class GoogleOAuth(OAuth):
 
         if not access_token:
             raise ValueError(f"Error in Google OAuth: {response_json}")
-
         return access_token
 
     def get_raw_user_info(self, token: str):
@@ -132,5 +132,68 @@ class GoogleOAuth(OAuth):
         return OAuthUserInfo(
             id=str(raw_info['sub']),
             name=None,
+            email=raw_info['email']
+        )
+
+
+class KeyCloakOAuth(OAuth):
+    _AUTH_PATH = 'auth/realms/default/protocol/openid-connect/auth'
+    _TOKEN_PATH = 'auth/realms/default/protocol/openid-connect/token'
+    _USER_INFO_PATH = 'auth/realms/default/protocol/openid-connect/userinfo'
+    _LogOut_PATH = 'auth/realms/default/protocol/openid-connect/logout'
+
+    def get_authorization_url(self):
+        params = {
+            'client_id': self.client_id,
+            'response_type': 'code',
+            'redirect_uri': self.redirect_uri,
+            'scope': 'openid email profile'
+        }
+        return f"{self.url}/{self._AUTH_PATH}?{urllib.parse.urlencode(params)}"
+
+    def get_access_token(self, code: str):
+        data = {
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': self.redirect_uri
+        }
+        headers = {'Accept': 'application/json'}
+        response = requests.post(f"{self.url}/{self._TOKEN_PATH}", data=data, headers=headers)
+
+        response_json = response.json()
+        access_token = response_json.get('access_token')
+        # id_token = response_json.get('id_token')
+        if not access_token:
+            raise ValueError(f"Error in KeyCloak SSO: {response_json}")
+
+        return access_token
+
+    def get_raw_user_info(self, token: str):
+        headers = {'Authorization': f"Bearer {token}"}
+        response = requests.get(f"{self.url}/{self._USER_INFO_PATH}", headers=headers)
+        response.raise_for_status()
+        return response.json()
+
+    def logout(self, code: str):
+        id_token = self.get_access_token(code)
+
+        params = {
+            'client_id': self.client_id,
+            'post_logout_redirect_uri': self.app_uri,
+            'id_token_hint': id_token
+        }
+        headers = {'Accept': 'application/json'}
+        response = requests.get(f"{self.url}/{self._LogOut_PATH}?{urllib.parse.urlencode(params)}", headers=headers)
+        if response.status_code != 200:
+            response_json = response.json()
+            raise ValueError(f"Error LogOut KeyCloak SSO: {response_json['error_description']}")
+        return 'success'
+
+    def _transform_user_info(self, raw_info: dict) -> OAuthUserInfo:
+        return OAuthUserInfo(
+            id=str(raw_info['sub']),
+            name=str(raw_info['name']),
             email=raw_info['email']
         )

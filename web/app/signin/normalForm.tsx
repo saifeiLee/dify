@@ -19,6 +19,7 @@ type IState = {
   formValid: boolean
   github: boolean
   google: boolean
+  keycloak: boolean
 }
 
 function reducer(state: IState, action: { type: string; payload: any }) {
@@ -53,6 +54,16 @@ function reducer(state: IState, action: { type: string; payload: any }) {
         ...state,
         google: false,
       }
+    case 'keycloak_login':
+      return {
+        ...state,
+        keycloak: true,
+      }
+    case 'keycloak_login_failed':
+      return {
+        ...state,
+        keycloak: false,
+      }
     default:
       throw new Error('Unknown action.')
   }
@@ -66,6 +77,7 @@ const NormalForm = () => {
     formValid: false,
     github: false,
     google: false,
+    keycloak: false,
   })
 
   const [showPassword, setShowPassword] = useState(false)
@@ -115,6 +127,16 @@ const NormalForm = () => {
     })
     : null, oauth)
 
+  // keycloak 扩展
+  const { data: keycloak, error: keycloak_error } = useSWR(state.keycloak
+    ? ({
+      url: '/oauth/login/keycloak',
+      // params: {
+      //   provider: 'keycloak',
+      // },
+    })
+    : null, oauth)
+
   useEffect(() => {
     if (github_error !== undefined)
       dispatch({ type: 'github_login_failed', payload: null })
@@ -129,6 +151,14 @@ const NormalForm = () => {
       window.location.href = google.redirect_url
   }, [google, google])
 
+  // keycloak 扩展
+  useEffect(() => {
+    if (keycloak_error !== undefined)
+      dispatch({ type: 'keycloak_login_failed', payload: null })
+    if (keycloak)
+      window.location.href = keycloak.redirect_url
+  }, [keycloak, keycloak_error])
+
   return (
     <>
       <div className="w-full mx-auto">
@@ -140,8 +170,47 @@ const NormalForm = () => {
         <div className="bg-white ">
           {!IS_CE_EDITION && (
             <div className="flex flex-col gap-3 mt-6">
+              {/*<div className='w-full'>*/}
+              {/*  <a href={`${apiPrefix}/oauth/login/github`}>*/}
+              {/*    <Button*/}
+              {/*      type='default'*/}
+              {/*      disabled={isLoading}*/}
+              {/*      className='w-full'*/}
+              {/*    >*/}
+              {/*      <>*/}
+              {/*        <span className={*/}
+              {/*          classNames(*/}
+              {/*            style.githubIcon,*/}
+              {/*            'w-5 h-5 mr-2',*/}
+              {/*          )*/}
+              {/*        } />*/}
+              {/*        <span className="truncate">{t('login.withGitHub')}</span>*/}
+              {/*      </>*/}
+              {/*    </Button>*/}
+              {/*  </a>*/}
+              {/*</div>*/}
+              {/*<div className='w-full'>*/}
+              {/*  <a href={`${apiPrefix}/oauth/login/google`}>*/}
+              {/*    <Button*/}
+              {/*      type='default'*/}
+              {/*      disabled={isLoading}*/}
+              {/*      className='w-full'*/}
+              {/*    >*/}
+              {/*      <>*/}
+              {/*        <span className={*/}
+              {/*          classNames(*/}
+              {/*            style.googleIcon,*/}
+              {/*            'w-5 h-5 mr-2',*/}
+              {/*          )*/}
+              {/*        } />*/}
+              {/*        <span className="truncate">{t('login.withGoogle')}</span>*/}
+              {/*      </>*/}
+              {/*    </Button>*/}
+              {/*  </a>*/}
+              {/*</div>*/}
+              {/*KeyCloak自定义单点登录按钮扩展*/}
               <div className='w-full'>
-                <a href={`${apiPrefix}/oauth/login/github`}>
+                <a href={`${apiPrefix}/oauth/login/keycloak`}>
                   <Button
                     type='default'
                     disabled={isLoading}
@@ -150,30 +219,11 @@ const NormalForm = () => {
                     <>
                       <span className={
                         classNames(
-                          style.githubIcon,
+                          style.keycloakIcon,
                           'w-5 h-5 mr-2',
                         )
                       } />
-                      <span className="truncate">{t('login.withGitHub')}</span>
-                    </>
-                  </Button>
-                </a>
-              </div>
-              <div className='w-full'>
-                <a href={`${apiPrefix}/oauth/login/google`}>
-                  <Button
-                    type='default'
-                    disabled={isLoading}
-                    className='w-full'
-                  >
-                    <>
-                      <span className={
-                        classNames(
-                          style.googleIcon,
-                          'w-5 h-5 mr-2',
-                        )
-                      } />
-                      <span className="truncate">{t('login.withGoogle')}</span>
+                      <span className="truncate">{t('login.withKeyCloak')}</span>
                     </>
                   </Button>
                 </a>

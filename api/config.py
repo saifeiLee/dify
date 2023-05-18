@@ -46,7 +46,7 @@ DEFAULTS = {
     'CELERY_BACKEND': 'database',
     'PDF_PREVIEW': 'True',
     'LOG_LEVEL': 'INFO',
-    'DISABLE_PROVIDER_CONFIG_VALIDATION': 'False',
+    'DISABLE_PROVIDER_CONFIG_VALIDATION': 'True',
 }
 
 
@@ -84,6 +84,11 @@ class Config:
         self.TESTING = False
         self.LOG_LEVEL = get_env('LOG_LEVEL')
         self.PDF_PREVIEW = get_bool_env('PDF_PREVIEW')
+
+        # 增加KeyCloak扩展参数
+        self.SSO_CLIENT_ID = get_env('SSO_CLIENT_ID')
+        self.SSO_CLIENT_SECRET = get_env('SSO_CLIENT_SECRET')
+        self.SSO_URL = get_env('SSO_URL')
 
         # Your App secret key will be used for securely signing the session cookie
         # Make sure you are changing this key for your deployment with a strong key.

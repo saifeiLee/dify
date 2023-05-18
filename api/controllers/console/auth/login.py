@@ -5,6 +5,7 @@ from flask import request, current_app
 from flask_restful import Resource, reqparse
 
 import services
+from .oauth import get_oauth_providers
 from controllers.console import api
 from controllers.console.error import AccountNotLinkTenantError
 from controllers.console.setup import setup_required
@@ -49,6 +50,12 @@ class LogoutApi(Resource):
 
     @setup_required
     def get(self):
+        # 扩展KeyCloak登出逻辑
+        # OAUTH_PROVIDERS = get_oauth_providers()
+        # code = request.args.get('code')
+        # oauth_provider = OAUTH_PROVIDERS.get('keycloak')
+        # oauth_provider.logout(code)
+
         flask.session.pop('workspace_id', None)
         flask_login.logout_user()
         return {'result': 'success'}
