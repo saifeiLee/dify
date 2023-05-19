@@ -1,6 +1,6 @@
 FROM langgenius/base:1.0.0-bullseye-slim as langgenius-api
 
-LABEL maintainer="takatost@gmail.com"
+LABEL maintainer="luowei@cvte.com"
 
 ENV FLASK_APP app.py
 ENV EDITION SELF_HOSTED

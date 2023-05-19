@@ -1,11 +1,12 @@
 FROM langgenius/base:1.0.0-bullseye-slim
 
-LABEL maintainer="takatost@gmail.com"
+LABEL maintainer="luowei@cvte.com"
 
 ENV EDITION SELF_HOSTED
 ENV DEPLOY_ENV PRODUCTION
 ENV CONSOLE_URL http://127.0.0.1:5001
 ENV APP_URL http://127.0.0.1:5001
+ENV NODE_OPTIONS --max-old-space-size=8096
 
 EXPOSE 3000
 
