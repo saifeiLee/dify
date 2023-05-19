@@ -41,7 +41,7 @@ class AzureProvider(BaseProvider):
             config = json.loads(encrypted_config)
         else:
             config = encrypted_config
-        config['openai_api_type'] = 'azure'
+        # config['openai_api_type'] = 'azure'
         config['deployment_name'] = model_id
         return config
 

@@ -6,6 +6,7 @@ models = {
     # 'gpt-3.5-turbo': 'openai',  # 4,096 tokens
     # ToDo: 切换 azure openai
     'gpt-3.5-turbo': 'azure_openai',  # 4,096 tokens
+    'gpt35-turbo-0301': 'azure_openai',  # 4,096 tokens
     'text-davinci-003': 'openai',  # 4,097 tokens
     'text-davinci-002': 'openai',  # 4,097 tokens
     'text-curie-001': 'openai',  # 2,049 tokens
