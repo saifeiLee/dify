@@ -42,7 +42,7 @@ class AzureProvider(BaseProvider):
         else:
             config = encrypted_config
         # config['openai_api_type'] = 'azure'
-        config['deployment_name'] = model_id
+        config['deployment_name'] = model_id.replace('.', '')
         return config
 
     def get_provider_name(self):
