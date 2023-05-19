@@ -22,6 +22,8 @@ import TabHeader from '../../base/tab-header'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import s from './style.module.css'
 import Button from '../../base/button'
+import { fetchAppList } from '@/service/apps'
+import useSWR, { SWRConfig } from 'swr'
 
 const TextGeneration = () => {
   const { t } = useTranslation()
@@ -40,6 +42,8 @@ const TextGeneration = () => {
   const [isResponsing, { setTrue: setResponsingTrue, setFalse: setResponsingFalse }] = useBoolean(false)
   const [query, setQuery] = useState('')
   const [completionRes, setCompletionRes] = useState('')
+  const { data: appList, mutate: mutateApps } = useSWR({ url: '/apps', params: { page: 1 } }, fetchAppList)
+
   const { notify } = Toast
   const isNoData = !completionRes
 
@@ -192,7 +196,7 @@ const TextGeneration = () => {
           isPC ? 'px-10 py-8' : 'bg-gray-50',
           isTablet && 'p-6', isMoble && 'p-4')}
     >
-      <>
+      {/* <>
         <div className='shrink-0 flex items-center justify-between'>
           <div className='flex items-center space-x-3'>
             <div className={s.starIcon}></div>
@@ -233,7 +237,7 @@ const TextGeneration = () => {
             </>
           )}
         </div>
-      </>
+      </> */}
     </div>
   )
 
