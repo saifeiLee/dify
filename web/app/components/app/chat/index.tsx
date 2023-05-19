@@ -18,6 +18,7 @@ import { Markdown } from '@/app/components/base/markdown'
 import LoadingAnim from './loading-anim'
 import { formatNumber } from '@/utils/format'
 import CopyBtn from './copy-btn'
+import SignIn from "@/app/signin/page";
 
 const stopIcon = (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -28,7 +29,6 @@ export type Feedbacktype = {
   rating: MessageRating
   content?: string | null
 }
-
 export type FeedbackFunc = (messageId: string, feedback: Feedbacktype) => Promise<any>
 export type SubmitAnnotationFunc = (messageId: string, content: string) => Promise<any>
 

@@ -11,12 +11,16 @@ class OAuthUserInfo:
     email: str
 
 class OAuth:
-    def __init__(self, client_id: str, client_secret: str, redirect_uri: str, app_uri: str, url: str):
+    def __init__(self, client_id: str, client_secret: str, redirect_uri: str, app_uri: str, logout: str,
+                 auth: str, token: str, user: str):
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
         self.app_uri = app_uri
-        self.url = url
+        self.logout = logout
+        self.auth = auth
+        self.token = token
+        self.user = user
 
     def get_authorization_url(self):
         raise NotImplementedError()
@@ -131,17 +135,12 @@ class GoogleOAuth(OAuth):
     def _transform_user_info(self, raw_info: dict) -> OAuthUserInfo:
         return OAuthUserInfo(
             id=str(raw_info['sub']),
-            name=None,
+            name='',
             email=raw_info['email']
         )
 
 
 class KeyCloakOAuth(OAuth):
-    _AUTH_PATH = 'auth/realms/default/protocol/openid-connect/auth'
-    _TOKEN_PATH = 'auth/realms/default/protocol/openid-connect/token'
-    _USER_INFO_PATH = 'auth/realms/default/protocol/openid-connect/userinfo'
-    _LogOut_PATH = 'auth/realms/default/protocol/openid-connect/logout'
-
     def get_authorization_url(self):
         params = {
             'client_id': self.client_id,
@@ -149,7 +148,7 @@ class KeyCloakOAuth(OAuth):
             'redirect_uri': self.redirect_uri,
             'scope': 'openid email profile'
         }
-        return f"{self.url}/{self._AUTH_PATH}?{urllib.parse.urlencode(params)}"
+        return f"{self.auth}?{urllib.parse.urlencode(params)}"
 
     def get_access_token(self, code: str):
         data = {
@@ -160,7 +159,7 @@ class KeyCloakOAuth(OAuth):
             'redirect_uri': self.redirect_uri
         }
         headers = {'Accept': 'application/json'}
-        response = requests.post(f"{self.url}/{self._TOKEN_PATH}", data=data, headers=headers)
+        response = requests.post(self.token, data=data, headers=headers)
 
         response_json = response.json()
         access_token = response_json.get('access_token')
@@ -172,7 +171,7 @@ class KeyCloakOAuth(OAuth):
 
     def get_raw_user_info(self, token: str):
         headers = {'Authorization': f"Bearer {token}"}
-        response = requests.get(f"{self.url}/{self._USER_INFO_PATH}", headers=headers)
+        response = requests.get(self.user, headers=headers)
         response.raise_for_status()
         return response.json()
 
@@ -185,7 +184,7 @@ class KeyCloakOAuth(OAuth):
             'id_token_hint': id_token
         }
         headers = {'Accept': 'application/json'}
-        response = requests.get(f"{self.url}/{self._LogOut_PATH}?{urllib.parse.urlencode(params)}", headers=headers)
+        response = requests.get(f"{self.logout}?{urllib.parse.urlencode(params)}", headers=headers)
         if response.status_code != 200:
             response_json = response.json()
             raise ValueError(f"Error LogOut KeyCloak SSO: {response_json['error_description']}")

@@ -18,22 +18,27 @@ def get_oauth_providers():
     with current_app.app_context():
         github_oauth = GitHubOAuth(client_id=current_app.config.get('GITHUB_CLIENT_ID'),
                                    client_secret=current_app.config.get('GITHUB_CLIENT_SECRET'),
-                                   app_uri=current_app.config.get('APP_URL'), url=None,
+                                   app_uri=current_app.config.get('APP_URL'),
+                                   auth='', token='', user='', logout='',
                                    redirect_uri=current_app.config.get(
                                        'CONSOLE_URL') + '/console/api/oauth/authorize/github')
 
         google_oauth = GoogleOAuth(client_id=current_app.config.get('GOOGLE_CLIENT_ID'),
                                    client_secret=current_app.config.get('GOOGLE_CLIENT_SECRET'),
-                                   app_uri=current_app.config.get('APP_URL'), url=None,
+                                   app_uri=current_app.config.get('APP_URL'),
+                                   auth='', token='', user='', logout='',
                                    redirect_uri=current_app.config.get(
                                        'CONSOLE_URL') + '/console/api/oauth/authorize/google')
 
         keycloak_oauth = KeyCloakOAuth(client_id=current_app.config.get('SSO_CLIENT_ID'),
                                        client_secret=current_app.config.get('SSO_CLIENT_SECRET'),
                                        app_uri=current_app.config.get('API_URL'),
-                                       url=current_app.config.get('SSO_URL'),
+                                       auth=current_app.config.get('SSO_AUTH_URL'),
+                                       token=current_app.config.get('SSO_TOKEN_URL'),
+                                       user=current_app.config.get('SSO_USER_URL'),
+                                       logout=current_app.config.get('SSO_LOGOUT_URL'),
                                        redirect_uri=current_app.config.get('CONSOLE_URL') +
-                                                    '/console/api/oauth/authorize/keycloak')
+                                                    "/console/api/oauth/authorize/keycloak")
 
         OAUTH_PROVIDERS = {
             'github': github_oauth,

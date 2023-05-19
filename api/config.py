@@ -88,7 +88,10 @@ class Config:
         # 增加KeyCloak扩展参数
         self.SSO_CLIENT_ID = get_env('SSO_CLIENT_ID')
         self.SSO_CLIENT_SECRET = get_env('SSO_CLIENT_SECRET')
-        self.SSO_URL = get_env('SSO_URL')
+        self.SSO_AUTH_URL = get_env('SSO_AUTH_URL')
+        self.SSO_TOKEN_URL = get_env('SSO_TOKEN_URL')
+        self.SSO_USER_URL = get_env('SSO_USER_URL')
+        self.SSO_LOGOUT_URL = get_env('SSO_LOGOUT_URL')
 
         # Your App secret key will be used for securely signing the session cookie
         # Make sure you are changing this key for your deployment with a strong key.

@@ -42,9 +42,7 @@ async def aget_embedding(text: str, engine: Optional[str] = None, openai_api_key
     # replace newlines, which can negatively affect performance.
     text = text.replace("\n", " ")
 
-    return (await openai.Embedding.acreate(input=[text], engine=engine, api_key=openai_api_key))["data"][0][
-        "embedding"
-    ]
+    return (await openai.Embedding.acreate(input=[text], engine=engine, api_key=openai_api_key))["data"][0]["embedding"]
 
 
 @retry(reraise=True, wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))

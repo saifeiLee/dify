@@ -69,7 +69,7 @@ class AzureProvider(BaseProvider):
                     'openai_api_type': 'azure',
                     'openai_api_version': '2023-03-15-preview',
                     # 'openai_api_base': 'https://foo.microsoft.com/bar',
-                    # todo: 临时固定
+                    # todo: 临时写死CVTE Azure OpenAI地址
                     'openai_api_base': 'https://openai-cvte.openai.azure.com',
                     'openai_api_key': ''
                 }
