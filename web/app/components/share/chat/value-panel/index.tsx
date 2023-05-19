@@ -50,30 +50,37 @@ export const PanelTitle: FC<{ title: string, className?: string }> = ({
   )
 }
 
-export const VarOpBtnGroup: FC<{ className?: string, onConfirm: () => void, onCancel: () => void }> = ({
-  className,
-  onConfirm,
-  onCancel
-}) => {
-  const { t } = useTranslation()
+export class VarOpBtnGroup extends React.Component<{
+  className?: string,
+  onConfirm: () => void,
+  onCancel: () => void
+}> {
+  render() {
+    let {
+      className,
+      onConfirm,
+      onCancel
+    } = this.props;
+    const {t} = useTranslation()
 
-  return (
-    <div className={cn(className, 'flex mt-3 space-x-2 mobile:ml-0 tablet:ml-[128px] text-sm')}>
-      <Button
-        className='text-sm'
-        type='primary'
-        onClick={onConfirm}
-      >
-        {t('common.operation.save')}
-      </Button>
-      <Button
-        className='text-sm'
-        onClick={onCancel}
-      >
-        {t('common.operation.cancel')}
-      </Button>
-    </div >
-  )
+    return (
+      <div className={cn(className, 'flex mt-3 space-x-2 mobile:ml-0 tablet:ml-[128px] text-sm')}>
+        <Button
+          className='text-sm'
+          type='primary'
+          onClick={onConfirm}
+        >
+          {t('common.operation.save')}
+        </Button>
+        <Button
+          className='text-sm'
+          onClick={onCancel}
+        >
+          {t('common.operation.cancel')}
+        </Button>
+      </div>
+    )
+  }
 }
 
 export default React.memo(TemplateVarPanel)

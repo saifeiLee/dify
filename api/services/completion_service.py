@@ -215,10 +215,10 @@ class CompletionService:
             except LLMAuthorizationError:
                 db.session.rollback()
                 PubHandler.pub_error(user, generate_task_id, LLMAuthorizationError('Incorrect API key provided'))
-            except Exception as e:
+            except Exception as ee:
                 db.session.rollback()
                 logging.exception("Unknown Error in completion")
-                PubHandler.pub_error(user, generate_task_id, e)
+                PubHandler.pub_error(user, generate_task_id, ee)
 
     @classmethod
     def countdown_and_close(cls, worker_thread, pubsub, user, generate_task_id) -> threading.Thread:

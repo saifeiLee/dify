@@ -36,6 +36,7 @@ class AzureProvider(BaseProvider):
         """
         Returns the API credentials for Azure OpenAI as a dictionary.
         """
+        # CVTE 客制化解决数据类型适配告警
         encrypted_config = self.get_provider_api_key(model_id=model_id)
         if isinstance(encrypted_config, str):
             config = json.loads(encrypted_config)
@@ -58,7 +59,7 @@ class AzureProvider(BaseProvider):
             config = {
                 'openai_api_type': 'azure',
                 'openai_api_version': '2023-03-15-preview',
-                'openai_api_base': 'https://foo.microsoft.com/bar',
+                'openai_api_base': 'https://<your-domain-prefix>.openai.azure.com/',
                 'openai_api_key': ''
             }
 

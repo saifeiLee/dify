@@ -18,15 +18,16 @@ from extensions.ext_database import db
 from extensions.ext_login import login_manager
 
 # DO NOT REMOVE BELOW
-from models import model, account, dataset, web, task
-from events import event_handlers
+# from models import model, account, dataset, web, task
+# from events import event_handlers
 # DO NOT REMOVE ABOVE
 
 import core
 from config import Config, CloudEditionConfig
 from commands import register_commands
 from models.account import TenantAccountJoin
-from models.model import Account, EndUser, App
+from models.model import Account
+# , EndUser, App
 
 import warnings
 warnings.simplefilter("ignore", ResourceWarning)
