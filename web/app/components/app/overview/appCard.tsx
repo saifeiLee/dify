@@ -182,12 +182,7 @@ function AppCard({
       {isApp
         ? (
           <div>
-            <ShareLink
-              isShow={showShareModal}
-              onClose={() => setShowShareModal(false)}
-              linkUrl={appUrl}
-              onGenerateCode={onGenerateCode}
-            />
+            <ShareLink isShow={showShareModal} onClose={() => setShowShareModal(false)} linkUrl={appUrl} onGenerateCode={onGenerateCode}/>
             <SettingsModal
               appInfo={appInfo}
               isShow={showSettingsModal}

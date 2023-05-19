@@ -37,7 +37,7 @@ def get_oauth_providers():
                                        token=current_app.config.get('SSO_TOKEN_URL'),
                                        user=current_app.config.get('SSO_USER_URL'),
                                        logout=current_app.config.get('SSO_LOGOUT_URL'),
-                                       redirect_uri=current_app.config.get('API_URL') +
+                                       redirect_uri=current_app.config.get('CONSOLE_URL') +
                                                     "/console/api/oauth/authorize/keycloak")
 
         OAUTH_PROVIDERS = {
