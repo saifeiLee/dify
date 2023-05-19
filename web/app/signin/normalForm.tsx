@@ -168,50 +168,7 @@ const NormalForm = () => {
 
       <div className="w-full mx-auto mt-8">
         <div className="bg-white ">
-          {!IS_CE_EDITION && (
-            <div className="flex flex-col gap-3 mt-6">
-              <div className='w-full'>
-                <a href={`${apiPrefix}/oauth/login/github`}>
-                  <Button
-                    type='default'
-                    disabled={isLoading}
-                    className='w-full'
-                  >
-                    <>
-                      <span className={
-                        classNames(
-                          style.githubIcon,
-                          'w-5 h-5 mr-2',
-                        )
-                      } />
-                      <span className="truncate">{t('login.withGitHub')}</span>
-                    </>
-                  </Button>
-                </a>
-              </div>
-              <div className='w-full'>
-                <a href={`${apiPrefix}/oauth/login/google`}>
-                  <Button
-                    type='default'
-                    disabled={isLoading}
-                    className='w-full'
-                  >
-                    <>
-                      <span className={
-                        classNames(
-                          style.googleIcon,
-                          'w-5 h-5 mr-2',
-                        )
-                      } />
-                      <span className="truncate">{t('login.withGoogle')}</span>
-                    </>
-                  </Button>
-                </a>
-              </div>
-            </div>
-          )}
-
-          {!IS_CE_EDITION && <>
+          { <>
               {/* <div className="relative mt-6">
                 <div className="absolute inset-0 flex items-center" aria-hidden="true">
                   <div className="w-full border-t border-gray-300" />
