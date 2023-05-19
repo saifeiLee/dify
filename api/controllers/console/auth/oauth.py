@@ -29,7 +29,7 @@ def get_oauth_providers():
                                    auth='', token='', user='', logout='',
                                    redirect_uri=current_app.config.get(
                                        'CONSOLE_URL') + '/console/api/oauth/authorize/google')
-
+        # CVTE 客制化
         keycloak_oauth = KeyCloakOAuth(client_id=current_app.config.get('SSO_CLIENT_ID'),
                                        client_secret=current_app.config.get('SSO_CLIENT_SECRET'),
                                        app_uri=current_app.config.get('API_URL'),

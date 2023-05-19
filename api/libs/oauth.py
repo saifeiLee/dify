@@ -140,6 +140,7 @@ class GoogleOAuth(OAuth):
         )
 
 
+# CVTE 客制化
 class KeyCloakOAuth(OAuth):
     def get_authorization_url(self):
         params = {

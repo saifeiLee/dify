@@ -133,7 +133,7 @@ class ProviderTokenApi(Resource):
 
         db.session.commit()
 
-        # ToDo: 临时调整释放AZURE_OPENAI支持
+        # CVTE 临时调整释放AZURE_OPENAI支持
         # if provider in [ProviderName.ANTHROPIC.value, ProviderName.AZURE_OPENAI.value, ProviderName.COHERE.value,
         #                 ProviderName.HUGGINGFACEHUB.value]:
         if provider in [ProviderName.ANTHROPIC.value, ProviderName.COHERE.value, ProviderName.HUGGINGFACEHUB.value]:
@@ -161,8 +161,6 @@ class ProviderTokenValidateApi(Resource):
         # todo: remove this when the provider is supported
         if provider in [ProviderName.ANTHROPIC.value, ProviderName.COHERE.value,
                         ProviderName.HUGGINGFACEHUB.value]:
-        # if provider in [ProviderName.ANTHROPIC.value, ProviderName.AZURE_OPENAI.value, ProviderName.COHERE.value,
-        #                 ProviderName.HUGGINGFACEHUB.value]:
             return {'result': 'success', 'warning': 'MOCK: This provider is not supported yet.'}
 
         result = True
