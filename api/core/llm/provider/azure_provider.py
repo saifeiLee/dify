@@ -91,20 +91,12 @@ class AzureProvider(BaseProvider):
         """
         Returns the encrypted token.
         """
-        # 添加Azure OpenAI适配
-        if config['openai_api_type'] == 'azure':
-            return json.dumps({
-                'openai_api_type': config['openai_api_type'],
-                'openai_api_base': config['openai_api_base'],
-                'openai_api_version': config['azure_api_version'],
-                'openai_api_key': self.encrypt_token(token=config['azure_api_key'])
-            })
-        else:
-            return json.dumps({
-                'openai_api_type': config['openai_api_type'],
-                'openai_api_base': config['openai_api_base'],
-                'openai_api_key': self.encrypt_token(token=config['openai_api_key'])
-            })
+        return json.dumps({
+            'openai_api_type': config['openai_api_type'],
+            'openai_api_base': config['openai_api_base'],
+            'openai_api_version': config['openai_api_version'],
+            'openai_api_key': self.encrypt_token(token=config['openai_api_key'])
+        })
 
     def get_decrypted_token(self, token: str):
         """
