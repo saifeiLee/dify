@@ -1,291 +1,211 @@
 'use client'
-import type { FC } from 'react'
-import React from 'react'
-import ReactECharts from 'echarts-for-react'
-import type { EChartsOption } from 'echarts'
-import useSWR from 'swr'
-import dayjs from 'dayjs'
-import { get } from 'lodash-es'
-import { formatNumber } from '@/utils/format'
+import React, { useState } from 'react'
+import {
+  Cog8ToothIcon,
+  DocumentTextIcon,
+  RocketLaunchIcon,
+  ShareIcon,
+} from '@heroicons/react/24/outline'
+import { SparklesIcon } from '@heroicons/react/24/solid'
+import { usePathname, useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import Basic from '@/app/components/app-sidebar/basic'
-import Loading from '@/app/components/base/loading'
-import type { AppDailyConversationsResponse, AppDailyEndUsersResponse, AppTokenCostsResponse } from '@/models/app'
-import { getAppDailyConversations, getAppDailyEndUsers, getAppTokenCosts } from '@/service/apps'
-const valueFormatter = (v: string | number) => v
+import SettingsModal from './settings'
+import ShareLink from './share-link'
+import CustomizeModal from './customize'
+import Tooltip from '@/app/components/base/tooltip'
+import AppBasic, { randomString } from '@/app/components/app-sidebar/basic'
+import Button from '@/app/components/base/button'
+import Tag from '@/app/components/base/tag'
+import Switch from '@/app/components/base/switch'
+import type { AppDetailResponse } from '@/models/app'
 
-const COLOR_TYPE_MAP = {
-  green: {
-    lineColor: 'rgba(6, 148, 162, 1)',
-    bgColor: ['rgba(6, 148, 162, 0.2)', 'rgba(67, 174, 185, 0.08)'],
-  },
-  orange: {
-    lineColor: 'rgba(255, 138, 76, 1)',
-    bgColor: ['rgba(254, 145, 87, 0.2)', 'rgba(255, 138, 76, 0.1)'],
-  },
-  blue: {
-    lineColor: 'rgba(28, 100, 242, 1)',
-    bgColor: ['rgba(28, 100, 242, 0.3)', 'rgba(28, 100, 242, 0.1)'],
-  },
-}
-
-const COMMON_COLOR_MAP = {
-  label: '#9CA3AF',
-  splitLineLight: '#F3F4F6',
-  splitLineDark: '#E5E7EB',
-}
-
-type IColorType = 'green' | 'orange' | 'blue'
-type IChartType = 'conversations' | 'endUsers' | 'costs'
-type IChartConfigType = { colorType: IColorType; showTokens?: boolean }
-
-const commonDateFormat = 'MMM D, YYYY'
-
-const CHART_TYPE_CONFIG: Record<string, IChartConfigType> = {
-  conversations: {
-    colorType: 'green',
-  },
-  endUsers: {
-    colorType: 'orange',
-  },
-  costs: {
-    colorType: 'blue',
-    showTokens: true,
-  },
-}
-
-const sum = (arr: number[]): number => {
-  return arr.reduce((acr, cur) => {
-    return acr + cur
-  })
-}
-
-export type PeriodParams = {
-  name: string
-  query: {
-    start: string
-    end: string
-  }
-}
-
-export type IBizChartProps = {
-  period: PeriodParams
-  id: string
-}
-
-export type IChartProps = {
+export type IAppCardProps = {
   className?: string
-  basicInfo: { title: string; explanation: string; timePeriod: string }
-  yMax?: number
-  chartType: IChartType
-  chartData: AppDailyConversationsResponse | AppDailyEndUsersResponse | AppTokenCostsResponse | { data: Array<{ date: string; count: number }> }
+  appInfo: AppDetailResponse
+  cardType?: 'app' | 'api'
+  customBgColor?: string
+  onChangeStatus: (val: boolean) => Promise<any>
+  onSaveSiteConfig?: (params: any) => Promise<any>
+  onGenerateCode?: () => Promise<any>
 }
 
-const Chart: React.FC<IChartProps> = ({
-  basicInfo: { title, explanation, timePeriod },
-  chartType = 'conversations',
-  chartData,
-  yMax,
+// todo: get image url from appInfo
+const defaultUrl = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+
+function AppCard({
+  appInfo,
+  cardType = 'app',
+  customBgColor,
+  onChangeStatus,
+  onSaveSiteConfig,
+  onGenerateCode,
   className,
-}) => {
+}: IAppCardProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false)
   const { t } = useTranslation()
-  const statistics = chartData.data
-  const statisticsLen = statistics.length
-  const extraDataForMarkLine = new Array(statisticsLen >= 2 ? statisticsLen - 2 : statisticsLen).fill('1')
-  extraDataForMarkLine.push('')
-  extraDataForMarkLine.unshift('')
 
-  const xData = statistics.map(({ date }) => date)
-  const yField = Object.keys(statistics[0]).find(name => name.includes('count')) || ''
-  const yData = statistics.map((item) => {
-    // @ts-expect-error field is valid
-    return item[yField] || 0
-  })
-
-  const options: EChartsOption = {
-    dataset: {
-      dimensions: ['date', yField],
-      source: statistics,
-    },
-    grid: { top: 8, right: 36, bottom: 0, left: 0, containLabel: true },
-    tooltip: {
-      trigger: 'item',
-      position: 'top',
-      borderWidth: 0,
-    },
-    xAxis: [{
-      type: 'category',
-      boundaryGap: false,
-      axisLabel: {
-        color: COMMON_COLOR_MAP.label,
-        hideOverlap: true,
-        overflow: 'break',
-        formatter(value) {
-          return dayjs(value).format(commonDateFormat)
-        },
-      },
-      axisLine: { show: false },
-      axisTick: { show: false },
-      splitLine: {
-        show: true,
-        lineStyle: {
-          color: COMMON_COLOR_MAP.splitLineLight,
-          width: 1,
-          type: [10, 10],
-        },
-        interval(index) {
-          return index === 0 || index === xData.length - 1
-        },
-      },
-    }, {
-      position: 'bottom',
-      boundaryGap: false,
-      data: extraDataForMarkLine,
-      axisLabel: { show: false },
-      axisLine: { show: false },
-      axisTick: { show: false },
-      splitLine: {
-        show: true,
-        lineStyle: {
-          color: COMMON_COLOR_MAP.splitLineDark,
-        },
-        interval(index, value) {
-          return !!value
-        },
-      },
-    }],
-    yAxis: {
-      max: yMax ?? 'dataMax',
-      type: 'value',
-      axisLabel: { color: COMMON_COLOR_MAP.label, hideOverlap: true },
-      splitLine: {
-        lineStyle: {
-          color: COMMON_COLOR_MAP.splitLineLight,
-        },
-      },
-    },
-    series: [
-      {
-        type: 'line',
-        showSymbol: true,
-        // symbol: 'circle',
-        // triggerLineEvent: true,
-        symbolSize: 4,
-        lineStyle: {
-          color: COLOR_TYPE_MAP[CHART_TYPE_CONFIG[chartType].colorType].lineColor,
-          width: 2,
-        },
-        itemStyle: {
-          color: COLOR_TYPE_MAP[CHART_TYPE_CONFIG[chartType].colorType].lineColor,
-        },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [{
-              offset: 0, color: COLOR_TYPE_MAP[CHART_TYPE_CONFIG[chartType].colorType].bgColor[0],
-            }, {
-              offset: 1, color: COLOR_TYPE_MAP[CHART_TYPE_CONFIG[chartType].colorType].bgColor[1],
-            }],
-            global: false,
-          },
-        },
-        tooltip: {
-          padding: [8, 12, 8, 12],
-          formatter(params) {
-            return `<div style='color:#6B7280;font-size:12px'>${params.name}</div>
-                          <div style='font-size:14px;color:#1F2A37'>${valueFormatter((params.data as any)[yField])}
-                              ${!CHART_TYPE_CONFIG[chartType].showTokens
-                ? ''
-                : `<span style='font-size:12px'>
-                                  <span style='margin-left:4px;color:#6B7280'>(</span>
-                                  <span style='color:#FF8A4C'>~$${get(params.data, 'total_price', 0)}</span>
-                                  <span style='color:#6B7280'>)</span>
-                              </span>`}
-                          </div>`
-          },
-        },
-      },
+  const OPERATIONS_MAP = {
+    app: [
+      { opName: t('appOverview.overview.appInfo.preview'), opIcon: RocketLaunchIcon },
+      { opName: t('appOverview.overview.appInfo.share.entry'), opIcon: ShareIcon },
+      { opName: t('appOverview.overview.appInfo.settings.entry'), opIcon: Cog8ToothIcon },
     ],
+    api: [{ opName: t('appOverview.overview.apiInfo.doc'), opIcon: DocumentTextIcon }],
   }
 
-  const sumData = sum(yData)
+  const isApp = cardType === 'app'
+  const basicName = isApp ? appInfo?.site?.title : t('appOverview.overview.apiInfo.title')
+  const runningStatus = isApp ? appInfo.enable_site : appInfo.enable_api
+  const { app_base_url, access_token } = appInfo.site ?? {}
+  const appUrl = `${app_base_url}/${appInfo.mode}/${access_token}`
+  const apiUrl = appInfo?.api_base_url
+
+  let bgColor = 'bg-primary-50 bg-opacity-40'
+  if (cardType === 'api')
+    bgColor = 'bg-purple-50'
+
+  const genClickFuncByName = (opName: string) => {
+    switch (opName) {
+      case t('appOverview.overview.appInfo.preview'):
+        return () => {
+          window.open(appUrl, '_blank')
+        }
+      case t('appOverview.overview.appInfo.share.entry'):
+        return () => {
+          setShowShareModal(true)
+        }
+      case t('appOverview.overview.appInfo.settings.entry'):
+        return () => {
+          setShowSettingsModal(true)
+        }
+      default:
+        // jump to page develop
+        return () => {
+          const pathSegments = pathname.split('/')
+          pathSegments.pop()
+          router.push(`${pathSegments.join('/')}/develop`)
+        }
+    }
+  }
+
+  const onClickCustomize = () => {
+    setShowCustomizeModal(true)
+  }
 
   return (
-    <div className={`flex flex-col w-full px-6 py-4 border-[0.5px] rounded-lg border-gray-200 shadow-sm ${className ?? ''}`}>
-      <div className='mb-3'>
-        <Basic name={title} type={timePeriod} hoverTip={explanation} />
+    <div
+      className={`flex flex-col w-full shadow-sm border-[0.5px] rounded-lg border-gray-200 ${className ?? ''}`}
+    >
+      <div className={`px-6 py-4 ${customBgColor ?? bgColor} rounded-lg`}>
+        <div className="mb-2.5 flex flex-row items-start justify-between">
+          <AppBasic
+            iconType={isApp ? 'app' : 'api'}
+            iconUrl={defaultUrl}
+            name={basicName}
+            type={
+              isApp
+                ? t('appOverview.overview.appInfo.explanation')
+                : t('appOverview.overview.apiInfo.explanation')
+            }
+          />
+          <div className="flex flex-row items-center h-9">
+            <Tag className="mr-2" color={runningStatus ? 'green' : 'yellow'}>
+              {runningStatus ? t('appOverview.overview.status.running') : t('appOverview.overview.status.disable')}
+            </Tag>
+            <Switch defaultValue={runningStatus} onChange={onChangeStatus} />
+          </div>
+        </div>
+        <div className="flex flex-col justify-center py-2">
+          <div className="py-1">
+            <div className="pb-1 text-xs text-gray-500">
+              {isApp ? t('appOverview.overview.appInfo.accessibleAddress') : t('appOverview.overview.apiInfo.accessibleAddress')}
+            </div>
+            <div className="text-sm text-gray-800">
+              {isApp ? appUrl : apiUrl}
+            </div>
+          </div>
+        </div>
+        <div
+          className={`pt-2 flex flex-row items-center ${!isApp ? 'mb-[calc(2rem_+_1px)]' : ''
+            }`}
+        >
+          {OPERATIONS_MAP[cardType].map((op) => {
+            return (
+              <Button
+                className="mr-2 text-gray-800"
+                key={op.opName}
+                onClick={genClickFuncByName(op.opName)}
+                disabled={
+                  [t('appOverview.overview.appInfo.preview'), t('appOverview.overview.appInfo.share.entry')].includes(op.opName) && !runningStatus
+                }
+              >
+                <Tooltip
+                  content={t('appOverview.overview.appInfo.preUseReminder') ?? ''}
+                  selector={`op-btn-${randomString(16)}`}
+                  className={
+                    ([t('appOverview.overview.appInfo.preview'), t('appOverview.overview.appInfo.share.entry')].includes(op.opName) && !runningStatus)
+                      ? 'mt-[-8px]'
+                      : '!hidden'
+                  }
+                >
+                  <div className="flex flex-row items-center">
+                    <op.opIcon className="h-4 w-4 mr-1.5" />
+                    <span className="text-xs">{op.opName}</span>
+                  </div>
+                </Tooltip>
+              </Button>
+            )
+          })}
+        </div>
       </div>
-      <div className='mb-4'>
-        <Basic
-          name={chartType !== 'costs' ? sumData.toLocaleString() : `${sumData < 1000 ? sumData : (formatNumber(Math.round(sumData / 1000)) + 'k')}`}
-          type={!CHART_TYPE_CONFIG[chartType].showTokens
-            ? ''
-            : <span>{t('appOverview.analysis.tokenUsage.consumed')} Tokens<span className='text-sm'>
-              <span className='ml-1 text-gray-500'>(</span>
-              <span className='text-orange-400'>~{sum(statistics.map(item => parseFloat(get(item, 'total_price', '0')))).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 4 })}</span>
-              <span className='text-gray-500'>)</span>
-            </span></span>}
-          textStyle={{ main: `!text-3xl !font-normal ${sumData === 0 ? '!text-gray-300' : ''}` }} />
-      </div>
-      <ReactECharts option={options} style={{ height: 160 }} />
+      {isApp
+        ? (
+          <div
+            className={
+              'flex items-center px-6 py-2 box-border text-xs text-gray-500 bg-opacity-50 bg-white border-t-[0.5px] border-primary-50'
+            }
+          >
+            <div
+              className="flex items-center hover:text-primary-600 hover:cursor-pointer"
+              onClick={onClickCustomize}
+            >
+              <SparklesIcon className="w-4 h-4 mr-1" />
+              {t('appOverview.overview.appInfo.customize.entry')}
+            </div>
+          </div>
+        )
+        : null}
+      {isApp
+        ? (
+          <div>
+            <ShareLink
+              isShow={showShareModal}
+              onClose={() => setShowShareModal(false)}
+              linkUrl={appUrl}
+              onGenerateCode={onGenerateCode}
+            />
+            <SettingsModal
+              appInfo={appInfo}
+              isShow={showSettingsModal}
+              onClose={() => setShowSettingsModal(false)}
+              onSave={onSaveSiteConfig}
+            />
+            <CustomizeModal
+              isShow={showCustomizeModal}
+              linkUrl=""
+              onClose={() => setShowCustomizeModal(false)}
+              appId={appInfo.id}
+              mode={appInfo.mode}
+            />
+          </div>
+        )
+        : null}
     </div>
   )
 }
 
-const getDefaultChartData = ({ start, end }: { start: string; end: string }) => {
-  const diffDays = dayjs(end).diff(dayjs(start), 'day')
-  return Array.from({ length: diffDays || 1 }, () => ({ date: '', count: 0 })).map((item, index) => {
-    item.date = dayjs(start).add(index, 'day').format(commonDateFormat)
-    return item
-  })
-}
-
-export const ConversationsChart: FC<IBizChartProps> = ({ id, period }) => {
-  const { t } = useTranslation()
-  const { data: response } = useSWR({ url: `/apps/${id}/statistics/daily-conversations`, params: period.query }, getAppDailyConversations)
-  if (!response)
-    return <Loading />
-  const noDataFlag = !response.data || response.data.length === 0
-  return <Chart
-    basicInfo={{ title: t('appOverview.analysis.totalMessages.title'), explanation: t('appOverview.analysis.totalMessages.explanation'), timePeriod: period.name }}
-    chartData={!noDataFlag ? response : { data: getDefaultChartData(period.query) }}
-    chartType='conversations'
-    {...(noDataFlag && { yMax: 500 })}
-  />
-}
-
-export const EndUsersChart: FC<IBizChartProps> = ({ id, period }) => {
-  const { t } = useTranslation()
-
-  const { data: response } = useSWR({ url: `/apps/${id}/statistics/daily-end-users`, id, params: period.query }, getAppDailyEndUsers)
-  if (!response)
-    return <Loading />
-  const noDataFlag = !response.data || response.data.length === 0
-  return <Chart
-    basicInfo={{ title: t('appOverview.analysis.activeUsers.title'), explanation: t('appOverview.analysis.activeUsers.explanation'), timePeriod: period.name }}
-    chartData={!noDataFlag ? response : { data: getDefaultChartData(period.query) }}
-    chartType='endUsers'
-    {...(noDataFlag && { yMax: 500 })}
-  />
-}
-
-export const CostChart: FC<IBizChartProps> = ({ id, period }) => {
-  const { t } = useTranslation()
-
-  const { data: response } = useSWR({ url: `/apps/${id}/statistics/token-costs`, params: period.query }, getAppTokenCosts)
-  if (!response)
-    return <Loading />
-  const noDataFlag = !response.data || response.data.length === 0
-  return <Chart
-    basicInfo={{ title: t('appOverview.analysis.tokenUsage.title'), explanation: t('appOverview.analysis.tokenUsage.explanation'), timePeriod: period.name }}
-    chartData={!noDataFlag ? response : { data: getDefaultChartData(period.query) }}
-    chartType='costs'
-    {...(noDataFlag && { yMax: 100 })}
-  />
-}
-
-export default Chart
+export default AppCard
