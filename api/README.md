@@ -2,17 +2,21 @@
 
 ## Usage
 
-1. Start the docker-compose stack
-
-   The backend require some middleware, including PostgreSQL, Redis, and Weaviate, which can be started together using `docker-compose`.
-   修改目录所有者为501账户后，在启动容器，否则会出现权限问题导致容器无法启动。
+1. 定义终端窗口环境变量
    ```bash
    export UID=$(id -u)
    export GID=$(id -g)
-
+   ```
+2. 修改目录所有者
+   ```bash
    cd ../docker
-   sudo chown -R 501:501 ./volumes
-
+   sudo chown -R (id -u):(id -g) ./volumes
+   ```
+2. Start the docker-compose stack
+   The backend require some middleware, including PostgreSQL, Redis, and Weaviate, which can be started together using `docker-compose`.
+   必须先修改目录所有者，再启动容器，否则会出现权限问题导致容器无法启动。
+   ```bash
+   cd ../docker
    docker-compose -f docker-compose.middleware.yaml up -d
    cd ../api
    ```

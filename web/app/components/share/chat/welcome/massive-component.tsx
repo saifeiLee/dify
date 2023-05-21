@@ -55,21 +55,18 @@ export const ChatBtn: FC<{ onClick: () => void, className?: string }> = ({
   )
 }
 
-export class EditBtn extends React.Component<{ className?: string, onClick: () => void }> {
-  render() {
-    let {className, onClick} = this.props;
-    const {t} = useTranslation()
+export const EditBtn = ({ className, onClick }: { className?: string; onClick: () => void }) => {
+  const { t } = useTranslation()
 
-    return (
-      <div
-        className={cn('px-2 flex space-x-1 items-center rounded-md  cursor-pointer', className)}
-        onClick={onClick}
-      >
-        <PencilIcon className='w-3 h-3'/>
-        <span>{t('common.operation.edit')}</span>
-      </div>
-    )
-  }
+  return (
+    <div
+      className={cn('px-2 flex space-x-1 items-center rounded-md  cursor-pointer', className)}
+      onClick={onClick}
+    >
+      <PencilIcon className='w-3 h-3' />
+      <span>{t('common.operation.edit')}</span>
+    </div>
+  )
 }
 
 export const FootLogo = () => (

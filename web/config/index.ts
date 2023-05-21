@@ -1,4 +1,4 @@
-const isDevelopment = process.env.DEPLOY_ENV === 'development';
+const isDevelopment = process.env.DEPLOY_ENV == 'development';
 
 export let apiPrefix = '';
 let publicApiPrefix = '';
@@ -18,17 +18,16 @@ if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PRE
   if (isDevelopment) {
     // apiPrefix = 'https://cloud.dify.dev/console/api';
     // publicApiPrefix = 'https://dev.udify.app/api';
-    apiPrefix = 'https://dify.cvte.com/console/api';
-    publicApiPrefix = 'https://dify.cvte.com/api';
+    apiPrefix = 'http://dify.cvte.cn:5001/console/api';
+    publicApiPrefix = 'http://dify.cvte.cn:5001/api';
   } else {
     // const domainParts = globalThis.location?.host?.split('.');
     // in production env, the host is dify.app . In other env, the host is [dev].dify.app
     // const env = domainParts.length === 2 ? 'ai' : domainParts?.[0];
-    // apiPrefix = '/console/api';
-    // publicApiPrefix = `/api`;
-
-    apiPrefix = 'https://dify.cvte.com/console/api';
-    publicApiPrefix = 'https://dify.cvte.com/api';
+    apiPrefix = '/console/api';
+    publicApiPrefix = `/api`;
+    // apiPrefix = 'http://dify.cvte.cn:5001/console/api';
+    // publicApiPrefix = 'http://dify.cvte.cn:5001/api';
     // avoid browser private mode api cross origin
   }
 }
