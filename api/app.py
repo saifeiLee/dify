@@ -99,7 +99,9 @@ def load_user(user_id):
 
         account = db.session.query(Account).filter(Account.id == account_id).first()
 
+
         if account:
+            session['id_token'] = account.id_token
             workspace_id = session.get('workspace_id')
             if workspace_id:
                 tenant_account_join = db.session.query(TenantAccountJoin).filter(

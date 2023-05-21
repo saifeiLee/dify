@@ -57,14 +57,16 @@ class AccountService:
         db.session.commit()
         return account
 
+    # CVTE: 用户创建加入域账户
     @staticmethod
-    def create_account(email: str, name: str, password: str = None,
+    def create_account(email: str, name: str, password: str = None, ldap_account: str = None,
                        interface_language: str = 'zh-Hans', interface_theme: str = 'light',
                        timezone: str = 'Asia/Shanghai', ) -> Account:
         """create account"""
         account = Account()
         account.email = email
         account.name = name
+        account.ldap_account = ldap_account
 
         if password:
             # generate password salt
@@ -137,6 +139,7 @@ class AccountService:
     def update_last_login(account: Account, request) -> None:
         """Update last login time and ip"""
         account.last_login_at = datetime.utcnow()
+        session['id_token'] = account.id_token
         account.last_login_ip = get_remote_ip(request)
         db.session.add(account)
         db.session.commit()
@@ -331,12 +334,13 @@ class TenantService:
 
 class RegisterService:
 
+    # CVTE: 用户注册加入域账户
     @staticmethod
-    def register(email, name, password: str = None, open_id: str = None, provider: str = None) -> Account:
+    def register(email, name, password: str = None, open_id: str = None, provider: str = None, ldap_account: str = None) -> Account:
         db.session.begin_nested()
         """Register account"""
         try:
-            account = AccountService.create_account(email, name, password)
+            account = AccountService.create_account(email, name, password, ldap_account)
             account.status = AccountStatus.ACTIVE.value
             account.initialized_at = datetime.utcnow()
 

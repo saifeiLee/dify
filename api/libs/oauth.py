@@ -9,18 +9,19 @@ class OAuthUserInfo:
     id: str
     name: str
     email: str
+    ldap_account: str
 
 class OAuth:
-    def __init__(self, client_id: str, client_secret: str, redirect_uri: str, app_uri: str, logout: str,
-                 auth: str, token: str, user: str):
+    def __init__(self, client_id: str, client_secret: str, redirect_uri: str, app_uri: str, logout_uri: str,
+                 auth_uri: str, token_uri: str, user_uri: str):
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
         self.app_uri = app_uri
-        self.logout = logout
-        self.auth = auth
-        self.token = token
-        self.user = user
+        self.auth_uri = auth_uri
+        self.token_uri = token_uri
+        self.user_uri = user_uri
+        self.logout_uri = logout_uri
 
     def get_authorization_url(self):
         raise NotImplementedError()
@@ -29,6 +30,9 @@ class OAuth:
         raise NotImplementedError()
 
     def get_raw_user_info(self, token: str):
+        raise NotImplementedError()
+
+    def logout(self, id_token: str):
         raise NotImplementedError()
 
     def get_user_info(self, token: str) -> OAuthUserInfo:
@@ -83,6 +87,9 @@ class GitHubOAuth(OAuth):
 
         return {**user_info, 'email': primary_email['email']}
 
+    def logout(self, id_token: str):
+        pass
+
     def _transform_user_info(self, raw_info: dict) -> OAuthUserInfo:
         email = raw_info.get('email')
         if not email:
@@ -90,6 +97,7 @@ class GitHubOAuth(OAuth):
         return OAuthUserInfo(
             id=str(raw_info['id']),
             name=raw_info['name'],
+            ldap_account='',
             email=email
         )
 
@@ -132,10 +140,14 @@ class GoogleOAuth(OAuth):
         response.raise_for_status()
         return response.json()
 
+    def logout(self, id_token: str):
+        pass
+
     def _transform_user_info(self, raw_info: dict) -> OAuthUserInfo:
         return OAuthUserInfo(
             id=str(raw_info['sub']),
             name='',
+            ldap_account='',
             email=raw_info['email']
         )
 
@@ -149,7 +161,7 @@ class KeyCloakOAuth(OAuth):
             'redirect_uri': self.redirect_uri,
             'scope': 'openid email profile'
         }
-        return f"{self.auth}?{urllib.parse.urlencode(params)}"
+        return f"{self.auth_uri}?{urllib.parse.urlencode(params)}"
 
     def get_access_token(self, code: str):
         data = {
@@ -160,32 +172,28 @@ class KeyCloakOAuth(OAuth):
             'redirect_uri': self.redirect_uri
         }
         headers = {'Accept': 'application/json'}
-        response = requests.post(self.token, data=data, headers=headers)
+        response = requests.post(self.token_uri, data=data, headers=headers)
 
         response_json = response.json()
         access_token = response_json.get('access_token')
-        # id_token = response_json.get('id_token')
         if not access_token:
             raise ValueError(f"Error in KeyCloak SSO: {response_json}")
 
-        return access_token
+        return response_json
 
     def get_raw_user_info(self, token: str):
         headers = {'Authorization': f"Bearer {token}"}
-        response = requests.get(self.user, headers=headers)
+        response = requests.get(self.user_uri, headers=headers)
         response.raise_for_status()
         return response.json()
 
-    def logout(self, code: str):
-        id_token = self.get_access_token(code)
-
+    def logout(self, id_token: str):
         params = {
             'client_id': self.client_id,
-            'post_logout_redirect_uri': self.app_uri,
             'id_token_hint': id_token
         }
         headers = {'Accept': 'application/json'}
-        response = requests.get(f"{self.logout}?{urllib.parse.urlencode(params)}", headers=headers)
+        response = requests.get(f"{self.logout_uri}?{urllib.parse.urlencode(params)}", headers=headers)
         if response.status_code != 200:
             response_json = response.json()
             raise ValueError(f"Error LogOut KeyCloak SSO: {response_json['error_description']}")
@@ -195,5 +203,6 @@ class KeyCloakOAuth(OAuth):
         return OAuthUserInfo(
             id=str(raw_info['sub']),
             name=str(raw_info['name']),
+            ldap_account=str(raw_info['preferred_username']),
             email=raw_info['email']
         )

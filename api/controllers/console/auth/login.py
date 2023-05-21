@@ -51,10 +51,11 @@ class LogoutApi(Resource):
     @setup_required
     def get(self):
         # 扩展KeyCloak登出逻辑
-        # OAUTH_PROVIDERS = get_oauth_providers()
-        # code = request.args.get('code')
-        # oauth_provider = OAUTH_PROVIDERS.get('keycloak')
-        # oauth_provider.logout(code)
+        OAUTH_PROVIDERS = get_oauth_providers()
+        id_token = flask.session.get('id_token')
+        if id_token:
+            oauth_provider = OAUTH_PROVIDERS.get('keycloak')
+            oauth_provider.logout(str(id_token))
 
         flask.session.pop('workspace_id', None)
         flask_login.logout_user()

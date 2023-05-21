@@ -23,6 +23,7 @@ class Account(UserMixin, db.Model):
 
     id = db.Column(UUID, server_default=db.text('uuid_generate_v4()'))
     name = db.Column(db.String(255), nullable=False)
+    ldap_account = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=False)
     password = db.Column(db.String(255), nullable=True)
     password_salt = db.Column(db.String(255), nullable=True)
@@ -36,6 +37,7 @@ class Account(UserMixin, db.Model):
     initialized_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
     updated_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
+    id_token = db.Column(db.Text, nullable=False)
 
     _current_tenant: db.Model = None
 

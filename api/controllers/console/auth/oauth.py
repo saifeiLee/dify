@@ -19,27 +19,26 @@ def get_oauth_providers():
         github_oauth = GitHubOAuth(client_id=current_app.config.get('GITHUB_CLIENT_ID'),
                                    client_secret=current_app.config.get('GITHUB_CLIENT_SECRET'),
                                    app_uri=current_app.config.get('APP_URL'),
-                                   auth='', token='', user='', logout='',
+                                   auth_uri='', token_uri='', user_uri='', logout_uri='',
                                    redirect_uri=current_app.config.get(
                                        'CONSOLE_URL') + '/console/api/oauth/authorize/github')
 
         google_oauth = GoogleOAuth(client_id=current_app.config.get('GOOGLE_CLIENT_ID'),
                                    client_secret=current_app.config.get('GOOGLE_CLIENT_SECRET'),
                                    app_uri=current_app.config.get('APP_URL'),
-                                   auth='', token='', user='', logout='',
+                                   auth_uri='', token_uri='', user_uri='', logout_uri='',
                                    redirect_uri=current_app.config.get(
                                        'CONSOLE_URL') + '/console/api/oauth/authorize/google')
         # CVTE 客制化
         keycloak_oauth = KeyCloakOAuth(client_id=current_app.config.get('SSO_CLIENT_ID'),
                                        client_secret=current_app.config.get('SSO_CLIENT_SECRET'),
                                        app_uri=current_app.config.get('API_URL'),
-                                       auth=current_app.config.get('SSO_AUTH_URL'),
-                                       token=current_app.config.get('SSO_TOKEN_URL'),
-                                       user=current_app.config.get('SSO_USER_URL'),
-                                       logout=current_app.config.get('SSO_LOGOUT_URL'),
+                                       auth_uri=current_app.config.get('SSO_AUTH_URL'),
+                                       token_uri=current_app.config.get('SSO_TOKEN_URL'),
+                                       user_uri=current_app.config.get('SSO_USER_URL'),
+                                       logout_uri=current_app.config.get('SSO_LOGOUT_URL'),
                                        redirect_uri=current_app.config.get('CONSOLE_URL') +
                                                     "/console/api/oauth/authorize/keycloak")
-
         OAUTH_PROVIDERS = {
             'github': github_oauth,
             'google': google_oauth,
@@ -71,7 +70,10 @@ class OAuthCallback(Resource):
 
         code = request.args.get('code')
         try:
-            token = oauth_provider.get_access_token(code)
+            response_json = oauth_provider.get_access_token(code)
+            token = response_json.get('access_token')
+            # CVTE: SESSION加入id_token
+            id_token = response_json.get('id_token')
             user_info = oauth_provider.get_user_info(token)
         except requests.exceptions.HTTPError as e:
             logging.exception(
@@ -79,6 +81,10 @@ class OAuthCallback(Resource):
             return {'error': 'OAuth process failed'}, 400
 
         account = _generate_account(provider, user_info)
+
+        # CVTE: SESSION加入id_token
+        account.id_token = id_token
+
         # Check account status
         if account.status == AccountStatus.BANNED.value or account.status == AccountStatus.CLOSED.value:
             return {'error': 'Account is banned or closed.'}, 403
@@ -117,6 +123,7 @@ def _generate_account(provider: str, user_info: OAuthUserInfo):
             name=account_name,
             password=None,
             open_id=user_info.id,
+            ldap_account=user_info.ldap_account,
             provider=provider
         )
 
@@ -128,6 +135,11 @@ def _generate_account(provider: str, user_info: OAuthUserInfo):
             interface_language = 'en-US'
         account.interface_language = interface_language
         db.session.commit()
+
+    # CVTE: 强制覆盖LDAP姓名
+    account_name = user_info.name if user_info.name else 'Dify'
+    account.name = account_name
+    account.ldap_account = user_info.ldap_account
 
     # Link account
     AccountService.link_account_integrate(provider, user_info.id, account)
