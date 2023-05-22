@@ -196,7 +196,7 @@ const TextGeneration = () => {
           isPC ? 'px-10 py-8' : 'bg-gray-50',
           isTablet && 'p-6', isMoble && 'p-4')}
     >
-      {/* <>
+      <>
         <div className='shrink-0 flex items-center justify-between'>
           <div className='flex items-center space-x-3'>
             <div className={s.starIcon}></div>
@@ -237,7 +237,7 @@ const TextGeneration = () => {
             </>
           )}
         </div>
-      </> */}
+      </>
     </div>
   )
 
