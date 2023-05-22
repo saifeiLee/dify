@@ -23,6 +23,8 @@ import { replaceStringWithValues } from '@/app/components/app/configuration/prom
 import AppUnavailable from '../../base/app-unavailable'
 import { userInputsFormToPromptVariables } from '@/utils/model-config'
 import { SuggestedQuestionsAfterAnswerConfig } from '@/models/debug'
+import { fetchAppList } from '@/service/apps'
+import useSWR, { SWRConfig } from 'swr'
 export type IMainProps = {
   params: {
     locale: string
@@ -50,6 +52,8 @@ const Main: FC<IMainProps> = () => {
   const [plan, setPlan] = useState<string>('basic') // basic/plus/pro
   // in mobile, show sidebar by click button
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
+  const { data: appList, mutate: mutateApps } = useSWR({ url: '/apps', params: { page: 1 } }, fetchAppList)
+
   // Can Use metadata(https://beta.nextjs.org/docs/api-reference/metadata) to set title. But it only works in server side client. 
   useEffect(() => {
     if (siteInfo?.title) {
