@@ -16,6 +16,8 @@ COPY package.json /app/web/package.json
 
 RUN npm install
 
+RUN rm -rf .next
+
 COPY . /app/web/
 
 RUN npm run build

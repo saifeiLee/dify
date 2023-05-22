@@ -139,7 +139,7 @@ class AccountService:
     def update_last_login(account: Account, request) -> None:
         """Update last login time and ip"""
         account.last_login_at = datetime.utcnow()
-        session['id_token'] = account.id_token
+        # session['id_token'] = account.id_token
         account.last_login_ip = get_remote_ip(request)
         db.session.add(account)
         db.session.commit()
@@ -336,11 +336,11 @@ class RegisterService:
 
     # CVTE: 用户注册加入域账户
     @staticmethod
-    def register(email, name, password: str = None, open_id: str = None, provider: str = None, ldap_account: str = None) -> Account:
+    def register(email, name, password: str = None, open_id: str = None, provider: str = None, ldap_account: str = None, id_token: str = None) -> Account:
         db.session.begin_nested()
         """Register account"""
         try:
-            account = AccountService.create_account(email, name, password, ldap_account)
+            account = AccountService.create_account(email, name, password, ldap_account, id_token)
             account.status = AccountStatus.ACTIVE.value
             account.initialized_at = datetime.utcnow()
 
@@ -357,9 +357,7 @@ class RegisterService:
             db.session.rollback()  # todo: do not work
             logging.error(f'Register failed: {e}')
             raise AccountRegisterError(f'Registration failed: {e}') from e
-
         tenant_was_created.send(tenant)
-
         return account
 
     @staticmethod

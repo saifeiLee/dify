@@ -170,5 +170,5 @@ class CustomRedisSessionInterface(RedisSessionInterface):
             domain=domain,
             path=path,
             secure=secure,
-            **conditional_cookie_kwargs,
+            **conditional_cookie_kwargs
         )

@@ -55,7 +55,7 @@ export const ChatBtn: FC<{ onClick: () => void, className?: string }> = ({
   )
 }
 
-export const EditBtn = ({ className, onClick }: { className?: string; onClick: () => void }) => {
+export const EditBtn = ({ className, onClick }: { className?: string, onClick: () => void }) => {
   const { t } = useTranslation()
 
   return (

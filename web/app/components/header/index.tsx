@@ -60,7 +60,7 @@ const Header: FC<IHeaderProps> = ({ appItems, curApp, userProfile, onLogout, lan
             border border-solid border-[#E5E7EB] rounded-l-[6px] rounded-r-[6px]
           '>
             <div className={s['alpha']} />
-            <div className='ml-1 text-xs font-semibold text-gray-700'>CVTE IT v0.01 {t('common.menus.status')}</div>
+            <div className='ml-1 text-xs font-semibold text-gray-700'>CVTE IT v1.5 {t('common.menus.status')}</div>
           </div>
         </div>
         <div className='flex items-center'>
