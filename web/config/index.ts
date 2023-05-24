@@ -1,8 +1,7 @@
-const isDevelopment = process.env.DEPLOY_ENV == 'development';
+const isDevelopment = process.env.NODE_ENV == 'development';
 
 export let apiPrefix = '';
 let publicApiPrefix = '';
-
 // NEXT_PUBLIC_API_PREFIX=/console/api NEXT_PUBLIC_PUBLIC_API_PREFIX=/api npm run start
 if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX) {
   apiPrefix = process.env.NEXT_PUBLIC_API_PREFIX;
@@ -17,7 +16,7 @@ if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PRE
 } else {
   if (isDevelopment) {
     // apiPrefix = 'https://dify.cvte.com/console/api';
-    // publicApiPrefix = 'https://dify.cvte.com/api';
+    // publicApiPrefix = 'https://dev.udify.app';
     apiPrefix = 'http://dify.cvte.cn:5001/console/api';
     publicApiPrefix = 'http://dify.cvte.cn:5001/api';
   } else {
@@ -26,8 +25,8 @@ if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PRE
     // const env = domainParts.length === 2 ? 'ai' : domainParts?.[0];
     apiPrefix = '/console/api';
     publicApiPrefix = `/api`;
-    // apiPrefix = 'https://dify.cvte.com/console/api';
-    // publicApiPrefix = 'https://dify.cvte.com/api';
+    // apiPrefix = 'http://dify.cvte.cn:5001/console/api';
+    // publicApiPrefix = 'http://dify.cvte.cn:5001/api';
     // avoid browser private mode api cross origin
   }
 }

@@ -46,7 +46,7 @@ DEFAULTS = {
     'CELERY_BACKEND': 'database',
     'PDF_PREVIEW': 'True',
     'LOG_LEVEL': 'INFO',
-    'DISABLE_PROVIDER_CONFIG_VALIDATION': 'False',
+    'DISABLE_PROVIDER_CONFIG_VALIDATION': 'True',
     'DEFAULT_LLM_PROVIDER': 'openai'
 }
 

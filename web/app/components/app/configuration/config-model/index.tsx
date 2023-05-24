@@ -27,6 +27,8 @@ export type IConifgModelProps = {
 const options = [
   { id: 'gpt-3.5-turbo', name: 'gpt-3.5-turbo', type: AppType.chat },
   { id: 'gpt-4', name: 'gpt-4', type: AppType.chat }, // 8k version
+  // CVTE 扩展文本生成型应用GPT4支持
+  { id: 'gpt-4', name: 'gpt-4', type: AppType.completion }, // 8k version
   { id: 'gpt-3.5-turbo', name: 'gpt-3.5-turbo', type: AppType.completion },
   { id: 'text-davinci-003', name: 'text-davinci-003', type: AppType.completion },
 ]
