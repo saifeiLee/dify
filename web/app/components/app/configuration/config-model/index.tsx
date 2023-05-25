@@ -27,10 +27,9 @@ export type IConifgModelProps = {
 const options = [
   { id: 'gpt-3.5-turbo', name: 'gpt-3.5-turbo', type: AppType.chat },
   { id: 'gpt-4', name: 'gpt-4', type: AppType.chat }, // 8k version
-  // CVTE 扩展文本生成型应用GPT4支持
-  { id: 'gpt-4', name: 'gpt-4', type: AppType.completion }, // 8k version
   { id: 'gpt-3.5-turbo', name: 'gpt-3.5-turbo', type: AppType.completion },
   { id: 'text-davinci-003', name: 'text-davinci-003', type: AppType.completion },
+  { id: 'gpt-4', name: 'gpt-4', type: AppType.completion }, // 8k version
 ]
 
 const ModelIcon = ({ className }: { className?: string }) => (
@@ -214,7 +213,7 @@ const ConifgModel: FC<IConifgModelProps> = ({
                   {!selectModelDisabled && <ChevronDownIcon className={cn(isShowOption && 'rotate-180', 'w-[14px] h-[14px] text-gray-500')} />}
                 </div>
                 {isShowOption && (
-                  <div className={cn(isChatApp ? 'w-[159px]' : 'w-[179px]', "absolute right-0 bg-gray-50 rounded-lg")} style={{zIndex: 10}}>
+                  <div className={cn(isChatApp ? 'w-[159px]' : 'w-[179px]', "absolute right-0 bg-gray-50 rounded-lg")}>
                     {availableModels.map(item => (
                       <div key={item.id} onClick={handleSelectModel(item.id)} className="flex items-center h-9 px-3 rounded-lg cursor-pointer hover:bg-gray-100">
                         <ModelIcon className='mr-2' />
