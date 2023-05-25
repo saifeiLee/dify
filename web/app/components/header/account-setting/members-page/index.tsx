@@ -35,7 +35,7 @@ const MembersPage = () => {
   const owner = accounts.filter(account => account.role === 'owner')?.[0]?.email === userProfile.email
   const { workspaces } = useWorkspacesContext()
   const currentWrokspace = workspaces.filter(item => item.current)?.[0]
-  
+
   return (
     <>
       <div>

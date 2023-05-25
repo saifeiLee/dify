@@ -92,6 +92,7 @@ const translation = {
     avatar: 'Avatar',
     name: 'Name',
     email: 'Email',
+    ldap_account: 'Ldap Account',
     langGeniusAccount: 'Dify account',
     langGeniusAccountTip: 'Your Dify account and associated user data.',
     editName: 'Edit Name',

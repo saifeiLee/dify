@@ -10,6 +10,7 @@ export type UserProfileResponse = {
   id: string
   name: string
   email: string
+  external_user_id: string
   interface_language?: string
   interface_theme?: string
   timezone?: string
@@ -48,7 +49,7 @@ export type TenantInfoResponse = {
   trial_end_reason: null | 'trial_exceeded' | 'using_custom'
 }
 
-export type Member = Pick<UserProfileResponse, 'id' | 'name' | 'email' | 'last_login_at' | 'created_at'> & {
+export type Member = Pick<UserProfileResponse, 'id' | 'name' | 'email' | 'last_login_at' | 'created_at' | 'external_user_id'> & {
   avatar: string
   status: 'pending' | 'active' | 'banned' | 'closed'
   role: 'owner' | 'admin' | 'normal'

@@ -37,8 +37,8 @@ def get_oauth_providers():
                                        token_uri=current_app.config.get('SSO_TOKEN_URL'),
                                        user_uri=current_app.config.get('SSO_USER_URL'),
                                        logout_uri=current_app.config.get('SSO_LOGOUT_URL'),
-                                       redirect_uri=current_app.config.get('CONSOLE_URL') +
-                                                    "/console/api/oauth/authorize/keycloak")
+                                       redirect_uri=current_app.config.get(
+                                           'CONSOLE_URL') + '/console/api/oauth/authorize/keycloak')
         OAUTH_PROVIDERS = {
             'github': github_oauth,
             'google': google_oauth,
@@ -98,6 +98,7 @@ class OAuthCallback(Resource):
         session.clear()
         flask_login.login_user(account, remember=True)
         AccountService.update_last_login(account, request)
+        aa = session
 
         return redirect(f'{current_app.config.get("APP_URL")}?oauth_login=success')
 

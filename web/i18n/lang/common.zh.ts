@@ -91,6 +91,7 @@ const translation = {
   account: {
     avatar: '头像',
     name: '用户名',
+    ldap_account: '域账户',
     email: '邮箱',
     edit: '编辑',
     langGeniusAccount: 'Dify 账号',

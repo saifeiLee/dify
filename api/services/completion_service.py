@@ -5,7 +5,7 @@ import time
 import uuid
 from typing import Generator, Union, Any
 
-from flask import current_app, Flask
+from flask import current_app, Flask, session
 from redis.client import PubSub
 from sqlalchemy import and_
 
@@ -174,10 +174,18 @@ class CompletionService:
 
     @classmethod
     def get_real_user_instead_of_proxy_obj(cls, user: Union[Account, EndUser]):
+        # CVTE 获取真实登录账户信息
+        account_id = session.get('_user_id')
+        account_info = None
+        if account_id:
+            account_info = db.session.query(Account).filter(Account.id == account_id).first()
+
         if isinstance(user, Account):
             user = db.session.query(Account).get(user.id)
+            user.external_user_id = (account_info.ldap_account if account_info else None)
         elif isinstance(user, EndUser):
             user = db.session.query(EndUser).get(user.id)
+            user.external_user_id = (account_info.ldap_account if account_info else None)
         else:
             raise Exception("Unknown user type")
 
@@ -215,10 +223,10 @@ class CompletionService:
             except LLMAuthorizationError:
                 db.session.rollback()
                 PubHandler.pub_error(user, generate_task_id, LLMAuthorizationError('Incorrect API key provided'))
-            except Exception as ee:
+            except Exception as e:
                 db.session.rollback()
                 logging.exception("Unknown Error in completion")
-                PubHandler.pub_error(user, generate_task_id, ee)
+                PubHandler.pub_error(user, generate_task_id, e)
 
     @classmethod
     def countdown_and_close(cls, worker_thread, pubsub, user, generate_task_id) -> threading.Thread:

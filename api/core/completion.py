@@ -135,16 +135,16 @@ class Completion:
         if mode == 'completion':
             prompt_template = OutLinePromptTemplate.from_template(
                 template=("""Use the following CONTEXT as your learned knowledge:
-                            [CONTEXT]
-                            {context}
-                            [END CONTEXT]
-                            
-                            When answer to user:
-                            - If you don't know, just say that you don't know.
-                            - If you don't know when you are not sure, ask for clarification. 
-                            Avoid mentioning that you obtained the information from the context.
-                            And answer according to the language of the user's question.
-                            """ if chain_output else "")
+[CONTEXT]
+{context}
+[END CONTEXT]
+
+When answer to user:
+- If you don't know, just say that you don't know.
+- If you don't know when you are not sure, ask for clarification. 
+Avoid mentioning that you obtained the information from the context.
+And answer according to the language of the user's question.
+""" if chain_output else "")
                          + (pre_prompt + "\n" if pre_prompt else "")
                          + "{query}\n"
             )

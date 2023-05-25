@@ -1,7 +1,8 @@
-const isDevelopment = process.env.NODE_ENV == 'development';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 export let apiPrefix = '';
 let publicApiPrefix = '';
+
 // NEXT_PUBLIC_API_PREFIX=/console/api NEXT_PUBLIC_PUBLIC_API_PREFIX=/api npm run start
 if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX) {
   apiPrefix = process.env.NEXT_PUBLIC_API_PREFIX;

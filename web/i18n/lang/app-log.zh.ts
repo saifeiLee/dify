@@ -6,6 +6,7 @@ const translation = {
     header: {
       time: '时间',
       endUser: '用户',
+      ldapAccount: '域账户',
       input: '输入',
       output: '输出',
       summary: '摘要',

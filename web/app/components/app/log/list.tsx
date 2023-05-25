@@ -403,7 +403,7 @@ const ConversationList: FC<IConversationList> = ({ logs, appDetail, onRefresh })
           <tr>
             <td className='w-[1.375rem]'></td>
             <td>{t('appLog.table.header.time')}</td>
-            <td>{t('appLog.table.header.endUser')}</td>
+            <td>{t('appLog.table.header.endUser')}{t('appLog.table.header.ldapUser')}</td>
             <td>{isChatMode ? t('appLog.table.header.summary') : t('appLog.table.header.input')}</td>
             <td>{isChatMode ? t('appLog.table.header.messageCount') : t('appLog.table.header.output')}</td>
             <td>{t('appLog.table.header.userRate')}</td>

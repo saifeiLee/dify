@@ -6,6 +6,7 @@ const translation = {
     header: {
       time: 'Time',
       endUser: 'End User',
+      ldapAccount: 'Ldap Account',
       input: 'Input',
       output: 'Output',
       summary: 'Summary',

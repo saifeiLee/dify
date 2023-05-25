@@ -13,12 +13,12 @@ class AzureProvider(BaseProvider):
     def get_models(self, model_id: Optional[str] = None, credentials: Optional[dict] = None) -> list[dict]:
         credentials = self.get_credentials(model_id) if not credentials else credentials
         url = "{}/openai/deployments?api-version={}".format(
-            credentials.get('openai_api_base'),
-            credentials.get('openai_api_version')
+            str(credentials.get('openai_api_base')),
+            str(credentials.get('openai_api_version'))
         )
 
         headers = {
-            "api-key": credentials.get('openai_api_key'),
+            "api-key": str(credentials.get('openai_api_key')),
             "content-type": "application/json; charset=utf-8"
         }
 
@@ -42,7 +42,8 @@ class AzureProvider(BaseProvider):
         """
         config = self.get_provider_api_key(model_id=model_id)
         config['openai_api_type'] = 'azure'
-        config['deployment_name'] = model_id.replace('.', '')
+        # toDo: CVTE Azure部署名称生成
+        config['deployment_name'] = model_id.replace('.', '') if model_id else None
         return config
 
     def get_provider_name(self):
@@ -125,10 +126,10 @@ class AzureProvider(BaseProvider):
         Returns the encrypted token.
         """
         return json.dumps({
-            'openai_api_type': config['openai_api_type'],
+            'openai_api_type': 'azure',
+            'openai_api_version': '2023-03-15-preview',
             'openai_api_base': config['openai_api_base'],
-            'openai_api_version': config['openai_api_version'],
-            'openai_api_key': self.encrypt_token(token=config['openai_api_key'])
+            'openai_api_key': self.encrypt_token(config['openai_api_key'])
         })
 
     def get_decrypted_token(self, token: str):

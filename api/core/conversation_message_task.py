@@ -2,6 +2,7 @@ import decimal
 import json
 from typing import Optional, Union
 
+from flask import session
 from core.callback_handler.entity.agent_loop import AgentLoop
 from core.callback_handler.entity.dataset_query import DatasetQueryObj
 from core.callback_handler.entity.llm_message import LLMMessage
@@ -286,7 +287,6 @@ class PubHandler:
     def generate_channel_name(cls, user: Union[Account | EndUser], task_id: str):
         if not user:
             raise ValueError("user is required")
-
         user_str = 'account-' + user.id if isinstance(user, Account) else 'end-user-' + user.id
         return "generate_result:{}-{}".format(user_str, task_id)
 

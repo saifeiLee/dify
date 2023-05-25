@@ -24,6 +24,7 @@ const AppContext = createContext<AppContextValue>({
     id: '',
     name: '',
     email: '',
+    ldap_account: '',
   },
   mutateUserProfile: () => { },
   pageContainerRef: createRef(),

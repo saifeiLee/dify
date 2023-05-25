@@ -18,16 +18,15 @@ from extensions.ext_database import db
 from extensions.ext_login import login_manager
 
 # DO NOT REMOVE BELOW
-# from models import model, account, dataset, web, task
-# from events import event_handlers
+from models import model, account, dataset, web, task
+from events import event_handlers
 # DO NOT REMOVE ABOVE
 
 import core
 from config import Config, CloudEditionConfig
 from commands import register_commands
 from models.account import TenantAccountJoin
-from models.model import Account
-# , EndUser, App
+from models.model import Account, EndUser, App
 
 import warnings
 warnings.simplefilter("ignore", ResourceWarning)
@@ -96,9 +95,7 @@ def load_user(user_id):
             tenant_id, account_id = user_id.split('.')
         else:
             account_id = user_id
-
         account = db.session.query(Account).filter(Account.id == account_id).first()
-
 
         if account:
             session['id_token'] = account.id_token
@@ -124,7 +121,6 @@ def load_user(user_id):
                 if tenant_account_join:
                     account.current_tenant_id = tenant_account_join.tenant_id
                     session['workspace_id'] = account.current_tenant_id
-
             # Log in the user with the updated user_id
             flask_login.login_user(account, remember=True)
 

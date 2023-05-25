@@ -139,7 +139,6 @@ class AccountService:
     def update_last_login(account: Account, request) -> None:
         """Update last login time and ip"""
         account.last_login_at = datetime.utcnow()
-        # session['id_token'] = account.id_token
         account.last_login_ip = get_remote_ip(request)
         db.session.add(account)
         db.session.commit()

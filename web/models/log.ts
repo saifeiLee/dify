@@ -49,6 +49,7 @@ export type Annotation = {
     id: string
     name: string
     email: string
+    external_user_id: string
   }
   created_at?: number
 }

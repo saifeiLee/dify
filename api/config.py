@@ -86,7 +86,10 @@ class Config:
         self.LOG_LEVEL = get_env('LOG_LEVEL')
         self.PDF_PREVIEW = get_bool_env('PDF_PREVIEW')
 
-        # 增加KeyCloak扩展参数
+        # CVTE 增加KeyCloak扩展参数
+        self.CHECK_UPDATE = get_env('CHECK_UPDATE')
+
+        # CVTE 增加KeyCloak扩展参数
         self.SSO_CLIENT_ID = get_env('SSO_CLIENT_ID')
         self.SSO_CLIENT_SECRET = get_env('SSO_CLIENT_SECRET')
         self.SSO_AUTH_URL = get_env('SSO_AUTH_URL')

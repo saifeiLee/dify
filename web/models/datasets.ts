@@ -280,7 +280,7 @@ export type HitTestingRecord = {
   content: string
   source: 'app' | 'hit_testing' | 'plugin'
   source_app_id: string
-  created_by_role: 'account' | 'end_user'
+  created_by_role: 'external_user_id' | 'account' | 'end_user'
   created_by: string
   created_at: number
 }
