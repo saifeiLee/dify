@@ -27,7 +27,8 @@ account_fields = {
     'timezone': fields.String,
     'last_login_at': TimestampField,
     'last_login_ip': fields.String,
-    'created_at': TimestampField
+    'created_at': TimestampField,
+    'ldap_account': fields.String
 }
 
 

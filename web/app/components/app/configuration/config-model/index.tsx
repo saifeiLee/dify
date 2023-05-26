@@ -213,9 +213,9 @@ const ConifgModel: FC<IConifgModelProps> = ({
                   {!selectModelDisabled && <ChevronDownIcon className={cn(isShowOption && 'rotate-180', 'w-[14px] h-[14px] text-gray-500')} />}
                 </div>
                 {isShowOption && (
-                  <div className={cn(isChatApp ? 'w-[159px]' : 'w-[179px]', "absolute right-0 bg-gray-50 rounded-lg")}>
+                  <div className={cn(isChatApp ? 'w-[159px]' : 'w-[179px]', "absolute right-0 bg-gray-50 rounded-lg")} style={{zIndex: 10}}>
                     {availableModels.map(item => (
-                      <div key={item.id} onClick={handleSelectModel(item.id)} className="flex items-center h-9 px-3 rounded-lg cursor-pointer hover:bg-gray-100" style={{zIndex: 10}}>
+                      <div key={item.id} onClick={handleSelectModel(item.id)} className="flex items-center h-9 px-3 rounded-lg cursor-pointer hover:bg-gray-100">
                         <ModelIcon className='mr-2' />
                         <div className="text-sm gray-900">{item.name}</div>
                       </div>

@@ -2,7 +2,6 @@ import decimal
 import json
 from typing import Optional, Union
 
-from flask import session
 from core.callback_handler.entity.agent_loop import AgentLoop
 from core.callback_handler.entity.dataset_query import DatasetQueryObj
 from core.callback_handler.entity.llm_message import LLMMessage
@@ -76,6 +75,13 @@ class ConversationMessageTask:
         introduction = ''
         system_instruction = ''
         system_instruction_tokens = 0
+        # CVTE 扩展域账户
+        if isinstance(self.user, EndUser):
+            ldap_account = self.user.external_user_id
+        elif isinstance(self.user, Account):
+            ldap_account = self.user.ldap_account
+        else:
+            ldap_account = None
         if self.mode == 'chat':
             introduction = self.app_model_config.opening_statement
             if introduction:
@@ -108,6 +114,8 @@ class ConversationMessageTask:
                 from_source=('console' if isinstance(self.user, Account) else 'api'),
                 from_end_user_id=(self.user.id if isinstance(self.user, EndUser) else None),
                 from_account_id=(self.user.id if isinstance(self.user, Account) else None),
+                # CVTE 扩展域账户
+                ldap_account=ldap_account,
             )
 
             db.session.add(self.conversation)
@@ -133,6 +141,8 @@ class ConversationMessageTask:
             from_source=('console' if isinstance(self.user, Account) else 'api'),
             from_end_user_id=(self.user.id if isinstance(self.user, EndUser) else None),
             from_account_id=(self.user.id if isinstance(self.user, Account) else None),
+            # CVTE 扩展域账户
+            ldap_account=ldap_account,
             agent_based=self.app_model_config.agent_mode_dict.get('enabled'),
         )
 

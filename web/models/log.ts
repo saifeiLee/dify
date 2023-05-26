@@ -72,6 +72,7 @@ export type MessageContent = {
     content: string | null
     from_source?: 'admin' | 'user'
     from_end_user_id?: string
+    ldap_account?: string
   }>
 }
 
@@ -80,6 +81,7 @@ export type CompletionConversationGeneralDetail = {
   status: 'normal' | 'finished'
   from_source: 'api' | 'console'
   from_end_user_id: string
+  ldap_account: string
   from_account_id: string
   read_at: Date
   created_at: number
@@ -106,6 +108,7 @@ export type CompletionConversationFullDetailResponse = {
   from_source: 'api' | 'console'
   from_end_user_id: string
   from_account_id: string
+  ldap_account: string
   // read_at: Date
   created_at: number
   model_config: {

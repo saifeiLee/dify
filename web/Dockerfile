@@ -14,6 +14,8 @@ WORKDIR /app/web
 
 COPY package.json /app/web/package.json
 
+COPY node_modules node_modules
+
 RUN npm install
 
 RUN rm -rf .next
@@ -25,6 +27,8 @@ RUN npm run build
 COPY docker/pm2.json /app/web/pm2.json
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+RUN rm -rf node_modules
 
 ARG COMMIT_SHA
 ENV COMMIT_SHA ${COMMIT_SHA}

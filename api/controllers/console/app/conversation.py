@@ -19,7 +19,8 @@ from models.model import Message, MessageAnnotation, Conversation
 account_fields = {
     'id': fields.String,
     'name': fields.String,
-    'email': fields.String
+    'email': fields.String,
+    'ldap_account': fields.String
 }
 
 feedback_fields = {
@@ -48,6 +49,7 @@ message_detail_fields = {
     'provider_response_latency': fields.Float,
     'from_source': fields.String,
     'from_end_user_id': fields.String,
+    'ldap_account': fields.String,
     'from_account_id': fields.String,
     'feedbacks': fields.List(fields.Nested(feedback_fields)),
     'annotation': fields.Nested(annotation_fields, allow_null=True),
@@ -96,6 +98,7 @@ class CompletionConversationApi(Resource):
         'from_source': fields.String,
         'from_end_user_id': fields.String,
         'from_account_id': fields.String,
+        'ldap_account': fields.String,
         'read_at': TimestampField,
         'created_at': TimestampField,
         'annotation': fields.Nested(annotation_fields, allow_null=True),
@@ -227,6 +230,7 @@ class ChatConversationApi(Resource):
         'from_source': fields.String,
         'from_end_user_id': fields.String,
         'from_account_id': fields.String,
+        'ldap_account': fields.String,
         'summary': fields.String(attribute='summary_or_query'),
         'read_at': TimestampField,
         'created_at': TimestampField,
@@ -339,6 +343,7 @@ class ChatConversationDetailApi(Resource):
         'from_source': fields.String,
         'from_end_user_id': fields.String,
         'from_account_id': fields.String,
+        'ldap_account': fields.String,
         'created_at': TimestampField,
         'annotated': fields.Boolean,
         'model_config': fields.Nested(model_config_fields),

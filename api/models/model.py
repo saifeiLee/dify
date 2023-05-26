@@ -198,6 +198,7 @@ class Conversation(db.Model):
     from_source = db.Column(db.String(255), nullable=False)
     from_end_user_id = db.Column(UUID)
     from_account_id = db.Column(UUID)
+    ldap_account = db.Column(db.String(255))
     read_at = db.Column(db.DateTime)
     read_account_id = db.Column(UUID)
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
@@ -335,6 +336,7 @@ class Message(db.Model):
     from_source = db.Column(db.String(255), nullable=False)
     from_end_user_id = db.Column(UUID)
     from_account_id = db.Column(UUID)
+    ldap_account = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
     updated_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
     agent_based = db.Column(db.Boolean, nullable=False, server_default=db.text('false'))
@@ -389,6 +391,7 @@ class MessageFeedback(db.Model):
     from_source = db.Column(db.String(255), nullable=False)
     from_end_user_id = db.Column(UUID)
     from_account_id = db.Column(UUID)
+    ldap_account = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
     updated_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
 

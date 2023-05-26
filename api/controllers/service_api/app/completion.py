@@ -81,6 +81,7 @@ class CompletionStopApi(AppApiResource):
 
 
 class ChatApi(AppApiResource):
+    # CVTE API消息发送调用
     def post(self, app_model, end_user):
         if app_model.mode != 'chat':
             raise NotChatAppError()
@@ -97,7 +98,6 @@ class ChatApi(AppApiResource):
 
         if end_user is None and args['user'] is not None:
             end_user = create_or_update_end_user_for_user_id(app_model, args['user'])
-
         try:
             response = CompletionService.completion(
                 app_model=app_model,

@@ -403,7 +403,7 @@ const ConversationList: FC<IConversationList> = ({ logs, appDetail, onRefresh })
           <tr>
             <td className='w-[1.375rem]'></td>
             <td>{t('appLog.table.header.time')}</td>
-            <td>{t('appLog.table.header.endUser')}{t('appLog.table.header.ldapUser')}</td>
+            <td>{t('appLog.table.header.endUser')}</td>
             <td>{isChatMode ? t('appLog.table.header.summary') : t('appLog.table.header.input')}</td>
             <td>{isChatMode ? t('appLog.table.header.messageCount') : t('appLog.table.header.output')}</td>
             <td>{t('appLog.table.header.userRate')}</td>
@@ -413,6 +413,7 @@ const ConversationList: FC<IConversationList> = ({ logs, appDetail, onRefresh })
         <tbody className="text-gray-500">
           {logs.data.map((log) => {
             const endUser = log.from_end_user_id?.slice(0, 8)
+            const ldapUser = log.ldap_account
             const leftValue = get(log, isChatMode ? 'summary' : 'message.query')
             const rightValue = get(log, isChatMode ? 'message_count' : 'message.answer')
             return <tr
@@ -424,7 +425,7 @@ const ConversationList: FC<IConversationList> = ({ logs, appDetail, onRefresh })
               }}>
               <td className='text-center align-middle'>{!log.read_at && <span className='inline-block bg-[#3F83F8] h-1.5 w-1.5 rounded'></span>}</td>
               <td className='w-[160px]'>{dayjs.unix(log.created_at).format(t('appLog.dateTimeFormat'))}</td>
-              <td>{renderTdValue(endUser || defaultValue, !endUser)}</td>
+              <td>{renderTdValue(ldapUser || endUser, !ldapUser)}</td>
               <td style={{ maxWidth: isChatMode ? 300 : 200 }}>
                 {renderTdValue(leftValue || t('appLog.table.empty.noChat'), !leftValue, isChatMode && log.annotated)}
               </td>

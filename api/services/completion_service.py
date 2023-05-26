@@ -175,17 +175,13 @@ class CompletionService:
     @classmethod
     def get_real_user_instead_of_proxy_obj(cls, user: Union[Account, EndUser]):
         # CVTE 获取真实登录账户信息
-        account_id = session.get('_user_id')
-        account_info = None
-        if account_id:
-            account_info = db.session.query(Account).filter(Account.id == account_id).first()
-
         if isinstance(user, Account):
             user = db.session.query(Account).get(user.id)
-            user.external_user_id = (account_info.ldap_account if account_info else None)
+            user.external_user_id = (user.ldap_account if user else None)
         elif isinstance(user, EndUser):
             user = db.session.query(EndUser).get(user.id)
-            user.external_user_id = (account_info.ldap_account if account_info else None)
+            if not user.external_user_id and user.type == 'service_api':
+                user.external_user_id = user.session_id
         else:
             raise Exception("Unknown user type")
 

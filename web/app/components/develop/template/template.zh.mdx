@@ -38,7 +38,7 @@ import { Row, Col, Properties, Property, Heading, SubProperty } from '../md.tsx'
         - streaming 流式返回。基于 SSE（**[Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)**）实现流式返回。
       </Property>
       <Property name='user' type='string' key='user'>
-        用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+        用户域账户，必须保证用户域账户真实、准确，刻意误传账户会导致空间禁用。
       </Property>
     </Properties>
   </Col>
@@ -106,7 +106,7 @@ import { Row, Col, Properties, Property, Heading, SubProperty } from '../md.tsx'
        like 或 dislike， 空值为撤销
       </Property>
       <Property name='user' type='string' key='user'>
-        用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+        用户域账户，必须保证用户域账户真实、准确，刻意误传账户会导致空间禁用。
       </Property>
     </Properties>
   </Col>
@@ -168,7 +168,7 @@ import { Row, Col, Properties, Property, Heading, SubProperty } from '../md.tsx'
 
     <Properties>
       <Property name='user' type='string' key='user'>
-        用户标识，由开发者定义规则，需保证用户标识在应用内唯一。
+        用户域账户，必须保证用户域账户真实、准确，刻意误传账户会导致空间禁用。
       </Property>
     </Properties>
   </Col>

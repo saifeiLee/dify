@@ -21,6 +21,7 @@ account_fields = {
     'created_at': TimestampField,
     'role': fields.String,
     'status': fields.String,
+    'ldap_account': fields.String
 }
 
 account_list_fields = {

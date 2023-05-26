@@ -75,16 +75,17 @@ def create_or_update_end_user_for_session(app_model):
     end_user = db.session.query(EndUser) \
         .filter(
         EndUser.session_id == session_id,
-        EndUser.type == 'browser'
+        EndUser.type == 'browser',
+        EndUser.external_user_id == session.get('ldapAccount')
     ).first()
-
     if end_user is None:
         end_user = EndUser(
             tenant_id=app_model.tenant_id,
             app_id=app_model.id,
             type='browser',
             is_anonymous=True,
-            session_id=session_id
+            session_id=session_id,
+            external_user_id=session.get('ldapAccount')
         )
         db.session.add(end_user)
         db.session.commit()

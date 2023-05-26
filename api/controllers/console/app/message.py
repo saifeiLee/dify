@@ -29,7 +29,8 @@ from services.message_service import MessageService
 account_fields = {
     'id': fields.String,
     'name': fields.String,
-    'email': fields.String
+    'email': fields.String,
+    'ldap_account': fields.String
 }
 
 feedback_fields = {
@@ -37,6 +38,7 @@ feedback_fields = {
     'content': fields.String,
     'from_source': fields.String,
     'from_end_user_id': fields.String,
+    'ldap_account': fields.String,
     'from_account': fields.Nested(account_fields, allow_null=True),
 }
 
@@ -59,6 +61,7 @@ message_detail_fields = {
     'from_source': fields.String,
     'from_end_user_id': fields.String,
     'from_account_id': fields.String,
+    'ldap_account': fields.String,
     'feedbacks': fields.List(fields.Nested(feedback_fields)),
     'annotation': fields.Nested(annotation_fields, allow_null=True),
     'created_at': TimestampField
