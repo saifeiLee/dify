@@ -37,7 +37,7 @@ class VersionApi(Resource):
             }
         else:
             return {
-                'version': '0.0.0',
+                'version': '1.65',
                 'release_date': '',
                 'release_notes': '',
                 'can_auto_update': False

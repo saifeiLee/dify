@@ -178,7 +178,7 @@ const translation = {
     changeLog: '更新日志',
     updateNow: '现在更新',
     nowAvailable: 'Dify {{version}} 现已可用。',
-    latestAvailable: 'Dify {{version}} 已是最新版本。',
+    latestAvailable: 'CVTE Dify {{version}} 已是最新版本。',
   },
   appMenus: {
     overview: '概览',

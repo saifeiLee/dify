@@ -26,8 +26,6 @@ if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PRE
     // const env = domainParts.length === 2 ? 'ai' : domainParts?.[0];
     apiPrefix = '/console/api';
     publicApiPrefix = `/api`;
-    // apiPrefix = 'http://dify.cvte.cn:5001/console/api';
-    // publicApiPrefix = 'http://dify.cvte.cn:5001/api';
     // avoid browser private mode api cross origin
   }
 }
