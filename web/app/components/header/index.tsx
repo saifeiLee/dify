@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelectedLayoutSegment, useRouter } from 'next/navigation'
 import classNames from 'classnames'
-import { CircleStackIcon, PuzzlePieceIcon } from '@heroicons/react/24/outline'
+import { CircleStackIcon, PuzzlePieceIcon, MoonIcon } from '@heroicons/react/24/outline'
 import { CommandLineIcon, Squares2X2Icon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import AccountDropdown from './account-dropdown'
@@ -46,6 +46,8 @@ const Header: FC<IHeaderProps> = ({ appItems, curApp, userProfile, onLogout, lan
   const showEnvTag = langeniusVersionInfo.current_env === 'TESTING' || langeniusVersionInfo.current_env === 'DEVELOPMENT'
   const selectedSegment = useSelectedLayoutSegment()
   const isPluginsComingSoon = selectedSegment === 'plugins-coming-soon'
+  // CVTE 添加运营报表页面
+  const isOperationTips = selectedSegment === 'operation'
   const isExplore = selectedSegment === 'explore'
   return (
     <div className={classNames(
@@ -119,6 +121,15 @@ const Header: FC<IHeaderProps> = ({ appItems, curApp, userProfile, onLogout, lan
             createText={t('common.menus.newDataset')}
             onCreate={() => router.push('/datasets/create')}
           />
+          {/* CVTE 添加运营报表页面*/}
+          <Link href="/operation" className={classNames(
+            navClassName, 'group',
+            isOperationTips && 'bg-white shadow-[0_2px_5px_-1px_rgba(0,0,0,0.05),0_2px_4px_-2px_rgba(0,0,0,0.05)]',
+            isOperationTips ? 'text-primary-600' : 'text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+          )}>
+            <MoonIcon className='mr-2 w-[18px] h-[18px]' />
+            {t('common.menus.operation')}
+          </Link>
         </div>
         <div className='flex items-center flex-shrink-0'>
           {

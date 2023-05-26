@@ -70,6 +70,8 @@ const translation = {
     datasetsTips: '即将到来: 上传自己的长文本数据，或通过 Webhook 集成自己的数据源',
     newApp: '创建应用',
     newDataset: '创建数据集',
+    operation: '运营报表',
+    OperationTips: '运营管理报表'
   },
   userProfile: {
     settings: '设置',
