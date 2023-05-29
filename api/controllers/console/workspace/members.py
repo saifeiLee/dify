@@ -89,7 +89,9 @@ class MemberCancelInviteApi(Resource):
     @login_required
     @account_initialization_required
     def delete(self, member_id):
-        member = Account.query.get(str(member_id))
+        # member = Account.query.get(str(member_id))
+        # CVTE SQLAlchemy兼容性修复
+        member = db.session.get(Account, str(member_id))
         if not member:
             abort(404)
 
@@ -122,7 +124,9 @@ class MemberUpdateRoleApi(Resource):
         if new_role not in ['admin', 'normal', 'owner']:
             return {'code': 'invalid-role', 'message': 'Invalid role'}, 400
 
-        member = Account.query.get(str(member_id))
+        # member = Account.query.get(str(member_id))
+        # CVTE SQLAlchemy兼容性修复
+        member = db.session.get(Account, str(member_id))
         if not member:
             abort(404)
 
