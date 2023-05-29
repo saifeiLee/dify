@@ -1,11 +1,11 @@
 # -*- coding:utf-8 -*-
 from datetime import datetime
-
 import pytz
 from flask import jsonify
+from models.model import Message
+from sqlalchemy import func
 from flask_login import login_required, current_user
 from flask_restful import Resource, reqparse
-
 from controllers.console import api
 from controllers.console.app import _get_app
 from controllers.console.setup import setup_required
@@ -29,49 +29,81 @@ class DailyConversationStatistic(Resource):
         parser.add_argument('end', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
         args = parser.parse_args()
 
-        sql_query = '''
-        SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date, count(distinct messages.conversation_id) AS conversation_count
-            FROM messages where app_id = :app_id 
-        '''
-        arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
-
-        timezone = pytz.timezone(account.timezone)
+        # sql_query = '''
+        # SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date, count(distinct messages.conversation_id) AS conversation_count
+        #     FROM messages where app_id = :app_id
+        # '''
+        # arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
+        #
+        # timezone = pytz.timezone(account.timezone)
         utc_timezone = pytz.utc
+
+        # CVTE SQLAlchemy兼容性调整
+        query = db.session.query(
+            func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))).label('date'),
+            func.count(func.distinct(Message.conversation_id)).label('conversation_count')
+        ).filter(
+            Message.app_id == app_model.id
+        )
 
         if args['start']:
             start_datetime = datetime.strptime(args['start'], '%Y-%m-%d %H:%M')
             start_datetime = start_datetime.replace(second=0)
 
-            start_datetime_timezone = timezone.localize(start_datetime)
-            start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
+            # start_datetime_timezone = timezone.localize(start_datetime)
+            # start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
 
-            sql_query += ' and created_at >= :start'
-            arg_dict['start'] = start_datetime_utc
+            start_datetime_utc = utc_timezone.localize(start_datetime)
+            start_datetime_timezone = start_datetime_utc.astimezone(pytz.timezone(account.timezone))
+
+            # sql_query += ' and created_at >= :start'
+            # arg_dict['start'] = start_datetime_utc
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at >= start_datetime_timezone)
 
         if args['end']:
             end_datetime = datetime.strptime(args['end'], '%Y-%m-%d %H:%M')
             end_datetime = end_datetime.replace(second=0)
 
-            end_datetime_timezone = timezone.localize(end_datetime)
-            end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+            # end_datetime_timezone = timezone.localize(end_datetime)
+            # end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+            end_datetime_utc = utc_timezone.localize(end_datetime)
+            end_datetime_timezone = end_datetime_utc.astimezone(pytz.timezone(account.timezone))
 
-            sql_query += ' and created_at < :end'
-            arg_dict['end'] = end_datetime_utc
+            # sql_query += ' and created_at < :end'
+            # arg_dict['end'] = end_datetime_utc
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at < end_datetime_timezone)
 
-        sql_query += ' GROUP BY date order by date'
-        rs = db.session.execute(sql_query, arg_dict)
+        # sql_query += ' GROUP BY date order by date'
+        # rs = db.session.execute(sql_query, arg_dict)
+        query = query.group_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
+        query = query.order_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
+        results = query.all()
 
-        response_date = []
+        response_data = []
 
-        for i in rs:
-            response_date.append({
-                'date': str(i.date),
-                'conversation_count': i.conversation_count
-            })
+        # CVTE SQLAlchemy兼容性调整
+        if len(results) > 0:
+            for result in results:
+                response_data.append({
+                    'date': str(result.date),
+                    'conversation_count': result.conversation_count
+                })
 
         return jsonify({
-            'data': response_date
+            'data': response_data
         })
+
+        # for i in rs:
+        #     response_date.append({
+        #         'date': str(i.date),
+        #         'conversation_count': i.conversation_count
+        #     })
+        #
+        # return jsonify({
+        #     'data': response_date
+        # })
 
 
 class DailyTerminalsStatistic(Resource):
@@ -89,49 +121,82 @@ class DailyTerminalsStatistic(Resource):
         parser.add_argument('end', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
         args = parser.parse_args()
 
-        sql_query = '''
-                SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date, count(distinct messages.from_end_user_id) AS terminal_count
-                    FROM messages where app_id = :app_id 
-                '''
-        arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
-
-        timezone = pytz.timezone(account.timezone)
+        # sql_query = '''
+        #         SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date, count(distinct messages.from_end_user_id) AS terminal_count
+        #             FROM messages where app_id = :app_id
+        #         '''
+        # arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
+        #
+        # timezone = pytz.timezone(account.timezone)
         utc_timezone = pytz.utc
+
+        # CVTE SQLAlchemy兼容性调整
+        query = db.session.query(
+            func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))).label('date'),
+            func.count(func.distinct(Message.from_end_user_id)).label('terminal_count')
+        ).filter(
+            Message.app_id == app_model.id
+        )
 
         if args['start']:
             start_datetime = datetime.strptime(args['start'], '%Y-%m-%d %H:%M')
             start_datetime = start_datetime.replace(second=0)
 
-            start_datetime_timezone = timezone.localize(start_datetime)
-            start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
+            # start_datetime_timezone = timezone.localize(start_datetime)
+            # start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
 
-            sql_query += ' and created_at >= :start'
-            arg_dict['start'] = start_datetime_utc
+            start_datetime_utc = utc_timezone.localize(start_datetime)
+            start_datetime_timezone = start_datetime_utc.astimezone(pytz.timezone(account.timezone))
+
+            # sql_query += ' and created_at >= :start'
+            # arg_dict['start'] = start_datetime_utc
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at >= start_datetime_timezone)
 
         if args['end']:
             end_datetime = datetime.strptime(args['end'], '%Y-%m-%d %H:%M')
             end_datetime = end_datetime.replace(second=0)
 
-            end_datetime_timezone = timezone.localize(end_datetime)
-            end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+            # end_datetime_timezone = timezone.localize(end_datetime)
+            # end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+            end_datetime_utc = utc_timezone.localize(end_datetime)
+            end_datetime_timezone = end_datetime_utc.astimezone(pytz.timezone(account.timezone))
 
-            sql_query += ' and created_at < :end'
-            arg_dict['end'] = end_datetime_utc
+            # sql_query += ' and created_at < :end'
+            # arg_dict['end'] = end_datetime_utc
 
-        sql_query += ' GROUP BY date order by date'
-        rs = db.session.execute(sql_query, arg_dict)
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at < end_datetime_timezone)
 
-        response_date = []
+        # sql_query += ' GROUP BY date order by date'
+        # rs = db.session.execute(sql_query, arg_dict)
+        query = query.group_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
+        query = query.order_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
 
-        for i in rs:
-            response_date.append({
-                'date': str(i.date),
-                'terminal_count': i.terminal_count
-            })
+        results = query.all()
+
+        response_data = []
+
+        # CVTE SQLAlchemy兼容性调整
+        if len(results) > 0:
+            for result in results:
+                response_data.append({
+                    'date': str(result.date),
+                    'terminal_count': result.terminal_count
+                })
 
         return jsonify({
-            'data': response_date
+            'data': response_data
         })
+        # for i in rs:
+        #     response_date.append({
+        #         'date': str(i.date),
+        #         'terminal_count': i.terminal_count
+        #     })
+        #
+        # return jsonify({
+        #     'data': response_date
+        # })
 
 
 class DailyTokenCostStatistic(Resource):
@@ -148,52 +213,74 @@ class DailyTokenCostStatistic(Resource):
         parser.add_argument('end', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
         args = parser.parse_args()
 
-        sql_query = '''
-                SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date, 
-                    (sum(messages.message_tokens) + sum(messages.answer_tokens)) as token_count,
-                    sum(total_price) as total_price
-                    FROM messages where app_id = :app_id 
-                '''
-        arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
+        # CVTE SQLAlchemy兼容性调整
+        query = db.session.query(
+            func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))).label('date'),
+            func.sum(Message.message_tokens + Message.answer_tokens).label('token_count'),
+            func.sum(Message.total_price).label('total_price')
+        ).filter(
+            Message.app_id == app_model.id
+        )
 
-        timezone = pytz.timezone(account.timezone)
+        # sql_query = '''
+        #         SELECT date(DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE :tz )) AS date,
+        #             (sum(messages.message_tokens) + sum(messages.answer_tokens)) as token_count,
+        #             sum(total_price) as total_price
+        #             FROM messages where app_id = :app_id
+        #         '''
+        # arg_dict = {'tz': account.timezone, 'app_id': app_model.id}
+        #
+        # timezone = pytz.timezone(account.timezone)
         utc_timezone = pytz.utc
 
         if args['start']:
             start_datetime = datetime.strptime(args['start'], '%Y-%m-%d %H:%M')
             start_datetime = start_datetime.replace(second=0)
 
-            start_datetime_timezone = timezone.localize(start_datetime)
-            start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
+            start_datetime_utc = utc_timezone.localize(start_datetime)
+            start_datetime_timezone = start_datetime_utc.astimezone(pytz.timezone(account.timezone))
 
-            sql_query += ' and created_at >= :start'
-            arg_dict['start'] = start_datetime_utc
+            # start_datetime_timezone = timezone.localize(start_datetime)
+            # start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
+
+            # sql_query += ' and created_at >= :start'
+            # arg_dict['start'] = start_datetime_utc
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at >= start_datetime_timezone)
 
         if args['end']:
             end_datetime = datetime.strptime(args['end'], '%Y-%m-%d %H:%M')
             end_datetime = end_datetime.replace(second=0)
 
-            end_datetime_timezone = timezone.localize(end_datetime)
-            end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+            # end_datetime_timezone = timezone.localize(end_datetime)
+            # end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+            end_datetime_utc = utc_timezone.localize(end_datetime)
+            end_datetime_timezone = end_datetime_utc.astimezone(pytz.timezone(account.timezone))
 
-            sql_query += ' and created_at < :end'
-            arg_dict['end'] = end_datetime_utc
+            # sql_query += ' and created_at < :end'
+            # arg_dict['end'] = end_datetime_utc
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at < end_datetime_timezone)
 
-        sql_query += ' GROUP BY date order by date'
-        rs = db.session.execute(sql_query, arg_dict)
+        # sql_query += ' GROUP BY date order by date'
+        # rs = db.session.execute(sql_query, arg_dict)
+        query = query.group_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
+        query = query.order_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
+        results = query.all()
 
-        response_date = []
+        response_data = []
 
-        for i in rs:
-            response_date.append({
-                'date': str(i.date),
-                'token_count': i.token_count,
-                'total_price': i.total_price,
-                'currency': 'USD'
-            })
+        # CVTE SQLAlchemy兼容性调整
+        if len(results) > 0:
+            for result in results:
+                response_data.append({
+                    'date': str(result.date),
+                    'token_count': result.token_count,
+                    'total_price': result.total_price
+                })
 
         return jsonify({
-            'data': response_date
+            'data': response_data
         })
 
 
