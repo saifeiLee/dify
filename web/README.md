@@ -37,3 +37,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## 环境变量配置
+1. 自定义添加如下环境变量。
+   ```yaml
+    # 问题需求反馈链接
+    FEEDBACK_URL=https://wxwork.jiandaoyun.com/app/611b7026c316d20009b413c5/entry/6474518948ada60008be4cf7?embed=true
+    
+    # 运营报表地址
+    REPORT_URL=https://grafana.cvte.com/d/ef91266f-b375-448c-9461-5ffa1bfb4884/dify-abstract?orgId=1&kiosk&var-channel=All&var-loan_no=&theme=light&refresh=1h
+    
+    # Console API base URL
+    CONSOLE_URL=http://dify.cvte.cn:5001
+    
+    # Service API base URL
+    API_URL=http://dify.cvte.cn:5001
+    ```

@@ -244,6 +244,7 @@ const getDefaultChartData = ({ start, end }: { start: string; end: string }) => 
   })
 }
 
+// 全部消息
 export const ConversationsChart: FC<IBizChartProps> = ({ id, period }) => {
   const { t } = useTranslation()
   const { data: response } = useSWR({ url: `/apps/${id}/statistics/daily-conversations`, params: period.query }, getAppDailyConversations)
@@ -258,6 +259,7 @@ export const ConversationsChart: FC<IBizChartProps> = ({ id, period }) => {
   />
 }
 
+// 活跃用户
 export const EndUsersChart: FC<IBizChartProps> = ({ id, period }) => {
   const { t } = useTranslation()
 
@@ -273,6 +275,7 @@ export const EndUsersChart: FC<IBizChartProps> = ({ id, period }) => {
   />
 }
 
+// 费用消费
 export const CostChart: FC<IBizChartProps> = ({ id, period }) => {
   const { t } = useTranslation()
 
