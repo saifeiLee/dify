@@ -38,6 +38,7 @@ class Account(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
     updated_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
     id_token = db.Column(db.Text, nullable=True)
+    department = db.Column(db.String(255))
 
     _current_tenant: db.Model = None
 
