@@ -178,7 +178,7 @@ const translation = {
   about: {
     changeLog: 'Changlog',
     updateNow: 'Update now',
-    nowAvailable: 'Dify {{version}} is now available.',
+    nowAvailable: 'CVTE Dify {{version}} is now available.',
     latestAvailable: 'CVTE Dify {{version}} is the latest version available.',
   },
   appMenus: {

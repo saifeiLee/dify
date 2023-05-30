@@ -29,6 +29,8 @@ import s from './style.module.css'
 
 import { fetchAppList } from '@/service/apps'
 import useSWR, { SWRConfig } from 'swr'
+import style from "@/app/(commonLayout)/list.module.css";
+import classNames from "classnames";
 export type IMainProps = {
   isInstalledApp?: boolean,
   installedAppInfo? : InstalledApp
@@ -546,6 +548,9 @@ const Main: FC<IMainProps> = ({
                 </div>
               </div>)
           }
+        </div>
+        <div>
+          <a className={style.socialMediaLink} target='_blank' href={process.env.FEEDBACK_URL}><span className={classNames(style.feedbackIcon)} /></a>
         </div>
       </div>
     </div>

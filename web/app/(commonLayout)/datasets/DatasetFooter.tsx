@@ -1,5 +1,6 @@
 'use client'
-
+import style from '../list.module.css'
+import classNames from 'classnames'
 import { useTranslation } from "react-i18next"
 
 const DatasetFooter = () => {
@@ -12,6 +13,10 @@ const DatasetFooter = () => {
       {/*  {t('dataset.intro1')}<a className='inline-flex items-center gap-1 link' target='_blank' href='/'>{t('dataset.intro2')}</a>{t('dataset.intro3')}<br />*/}
       {/*  {t('dataset.intro4')}<a className='inline-flex items-center gap-1 link' target='_blank' href='/'>{t('dataset.intro5')}</a>{t('dataset.intro6')}*/}
       {/*</p>*/}
+      <div>
+          <a className={style.socialMediaLink} target='_blank' href={process.env.FEEDBACK_URL}><span className={classNames(style.feedbackIcon)} /></a>
+          {/*<a className={style.socialMediaLink} target='_blank' href='https://discord.gg/FngNHpbcY7'><span className={classNames(style.socialMediaIcon, style.discordIcon)} /></a>*/}
+        </div>
     </footer>
   )
 }

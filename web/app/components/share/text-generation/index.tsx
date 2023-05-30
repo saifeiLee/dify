@@ -27,6 +27,8 @@ import useSWR, { SWRConfig } from 'swr'
 import { App } from '@/types/app'
 import { InstalledApp } from '@/models/explore'
 import { appDefaultIconBackground } from '@/config'
+import style from "@/app/(commonLayout)/list.module.css";
+import classNames from "classnames";
 
 export type IMainProps = {
   isInstalledApp?: boolean,
@@ -383,6 +385,9 @@ const TextGeneration: FC<IMainProps> = ({
             {renderRes}
           </div>
         )}
+        <div>
+          <a className={style.socialMediaLink} target='_blank' href={process.env.FEEDBACK_URL}><span className={classNames(style.feedbackIcon)} /></a>
+        </div>
       </div>
     </>
   )
