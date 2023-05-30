@@ -4,8 +4,9 @@
 
 1. 定义终端窗口环境变量
    ```bash
-   export UID=$(id -u)
-   export GID=$(id -g)
+   echo "export UID=$(id -u)" >> ~/.zshrc
+   echo "export GID=$(id -g)" >> ~/.zshrc
+   source ~/.zshrc
    ```
 2. 修改目录所有者
    ```bash
@@ -42,4 +43,10 @@
    flask run --host 0.0.0.0 --port=5001 --debug
    ```
 7. Setup your application by visiting http://localhost:5001/console/api/setup or other apis...
+
 8. If you need to debug local async processing, you can run `celery -A app.celery worker`, celery can do dataset importing and other async tasks.
+
+10. 如需使用国内OpenAI代理，在Worker、API添加如下环境变量即可。
+   ```yaml
+   OPENAI_API_BASE=https://azure-gpt-proxy.gz.cvte.cn/v1
+   ```
