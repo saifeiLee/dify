@@ -284,6 +284,86 @@ class DailyTokenCostStatistic(Resource):
         })
 
 
+# CVTE 会话延迟统计
+class DailyResponseLatencyStatistic(Resource):
+    @setup_required
+    @login_required
+    @account_initialization_required
+    def get(self, app_id):
+        account = current_user
+        app_id = str(app_id)
+        app_model = _get_app(app_id)
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('start', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
+        parser.add_argument('end', type=datetime_string('%Y-%m-%d %H:%M'), location='args')
+        args = parser.parse_args()
+        utc_timezone = pytz.utc
+
+        query = db.session.query(
+            func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))).label('date'),
+            func.max(Message.provider_response_latency).label('max_latency'),
+            func.avg(Message.provider_response_latency).label('avg_latency'),
+            func.min(Message.provider_response_latency).label('min_latency')
+        ).filter(
+            Message.app_id == app_model.id
+        )
+
+        if args['start']:
+            start_datetime = datetime.strptime(args['start'], '%Y-%m-%d %H:%M')
+            start_datetime = start_datetime.replace(second=0)
+
+            # start_datetime_timezone = timezone.localize(start_datetime)
+            # start_datetime_utc = start_datetime_timezone.astimezone(utc_timezone)
+
+            start_datetime_utc = utc_timezone.localize(start_datetime)
+            start_datetime_timezone = start_datetime_utc.astimezone(pytz.timezone(account.timezone))
+
+            # sql_query += ' and created_at >= :start'
+            # arg_dict['start'] = start_datetime_utc
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at >= start_datetime_timezone)
+
+        if args['end']:
+            end_datetime = datetime.strptime(args['end'], '%Y-%m-%d %H:%M')
+            end_datetime = end_datetime.replace(second=0)
+
+            # end_datetime_timezone = timezone.localize(end_datetime)
+            # end_datetime_utc = end_datetime_timezone.astimezone(utc_timezone)
+            end_datetime_utc = utc_timezone.localize(end_datetime)
+            end_datetime_timezone = end_datetime_utc.astimezone(pytz.timezone(account.timezone))
+
+            # sql_query += ' and created_at < :end'
+            # arg_dict['end'] = end_datetime_utc
+
+            # CVTE SQLAlchemy兼容性调整
+            query = query.filter(Message.created_at < end_datetime_timezone)
+
+        # sql_query += ' GROUP BY date order by date'
+        # rs = db.session.execute(sql_query, arg_dict)
+        query = query.group_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
+        query = query.order_by(func.date(func.DATE_TRUNC('day', func.timezone(account.timezone, Message.created_at))))
+
+        results = query.all()
+
+        response_data = []
+
+        # CVTE SQLAlchemy兼容性调整
+        if len(results) > 0:
+            for result in results:
+                response_data.append({
+                    'date': str(result.date),
+                    'max_latency': result.max_latency,
+                    'avg_latency': result.avg_latency,
+                    'min_latency': result.min_latency
+                })
+
+        return jsonify({
+            'data': response_data
+        })
+
+
 api.add_resource(DailyConversationStatistic, '/apps/<uuid:app_id>/statistics/daily-conversations')
 api.add_resource(DailyTerminalsStatistic, '/apps/<uuid:app_id>/statistics/daily-end-users')
 api.add_resource(DailyTokenCostStatistic, '/apps/<uuid:app_id>/statistics/token-costs')
+api.add_resource(DailyResponseLatencyStatistic, '/apps/<uuid:app_id>/statistics/response-latency')
